@@ -1,0 +1,34 @@
+package itemsweb
+
+import "fmt"
+
+templ item(name string) {
+	<div class="border border-gray-100 rounded shadow p-2">{ name }</div>
+}
+
+templ Items(shopID string, items []string) {
+	<div>
+		<div class="grid grid-cols-3 gap-1 p-2" id={ fmt.Sprintf("shop-items-%v", shopID) }>
+			for _, i := range items {
+				@item(i)
+			}
+		</div>
+		<form hx-post="/items" hx-target={ fmt.Sprintf("#shop-items-%v", shopID) } hx-swap="beforeend" hx-on::after-request="this.reset()">
+			<div class="grid grid-cols-3 gap-1 p-2">
+				<input type="hidden" name="shopID" value={ shopID }/>
+				<input
+					class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+					placeholder="New item"
+					type="text"
+					name="itemName"
+					id={ fmt.Sprintf("shop-item-add-%v", shopID) }
+				/>
+				<input
+					class="bg-indigo-800 p-2 rounded text-white"
+					type="submit"
+					value="Add"
+				/>
+			</div>
+		</form>
+	</div>
+}

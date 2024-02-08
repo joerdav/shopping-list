@@ -1,0 +1,64 @@
+package common
+
+templ Layout(title, path string) {
+	<html class="h-full bg-gray-100">
+		<head>
+			<title>Shopping List - { title }</title>
+			<link rel="stylesheet" href="/public/styles.css"/>
+			<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+		</head>
+		<body class="h-full">
+			<div class="min-h-full">
+				@nav(path)
+				<header class="bg-white shadow">
+					<div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+						<h1 class="text-3xl font-bold tracking-tight text-gray-900">{ title }</h1>
+					</div>
+				</header>
+				<main>
+					<div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
+						{ children... }
+					</div>
+				</main>
+			</div>
+		</body>
+	</html>
+}
+
+templ nav(path string) {
+	<nav class="bg-gray-800">
+		<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+			<div class="flex h-16 items-center justify-between">
+				<div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+					<div class="flex flex-shrink-0 items-center font-medium text-lg text-white">
+						Shopping List
+					</div>
+					<div class="hidden sm:ml-6 sm:block">
+						<div class="flex space-x-4">
+							for _, l := range links {
+								<a
+									href={ templ.SafeURL(l.Url) }
+									class={
+										templ.KV("bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium", path == l.Url),
+										templ.KV("text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium", path != l.Url),
+									}
+								>
+									{ l.Title }
+								</a>
+							}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</nav>
+}
+
+var links = []struct {
+	Title string
+	Url   string
+}{
+	{"Home", "/"},
+	{"Shops", "/shops"},
+	{"Recipes", "/recipes"},
+}

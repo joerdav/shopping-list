@@ -1,0 +1,72 @@
+package recipesweb
+
+import "fmt"
+import "github.com/joerdav/shopping-list/app/common"
+
+func ingredientInRecipe(ingredientID string, recipe Recipe) bool {
+	for _, i := range recipe.Ingredients {
+		if i.ID == ingredientID {
+			return true
+		}
+	}
+	return false
+}
+
+templ Ingredients(recipe Recipe, availableIngredients []Item) {
+	<div class="recipe bg-white rounded shadow py-2 px-6" id={ fmt.Sprintf("recipe-%v", recipe.ID) }>
+		<h2 class="text-gray-900 font-bold pb-2 border-b border-b-gray-200">{ recipe.Name }</h2>
+		<div class="pt-3">
+			for _,  i := range recipe.Ingredients {
+				<div class="grid grid-cols-3">
+					<p class="col-span-2">{ i.Name }</p>
+					@common.SetQuantity(fmt.Sprintf("/recipes/%v", recipe.ID), fmt.Sprintf("#recipe-%v", recipe.ID), "itemID", i.ID, i.Quantity)
+				</div>
+			}
+			<select
+				name="itemID"
+				hx-trigger="change"
+				hx-put={ fmt.Sprintf("/recipes/%v", recipe.ID) }
+				hx-target={ fmt.Sprintf("#recipe-%v", recipe.ID) }
+				hx-swap="outerHTML"
+				hx-vals='{"quantity":"1"}'
+				class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+			>
+				<option value="">Select an ingredient</option>
+				for _, v := range availableIngredients {
+					if !ingredientInRecipe(v.ID, recipe) {
+						<option value={ v.ID }>{ v.Name }</option>
+					}
+				}
+			</select>
+		</div>
+	</div>
+}
+
+templ RecipesPage(path string, recipes []Recipe, availableIngredients []Item) {
+	@common.Layout("Recipes", path) {
+		<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+			for _, r := range recipes {
+				@Ingredients(r, availableIngredients)
+			}
+			<div id="recipes" class="border-4 border-dashed border-gray-300 bg-gray-200 rounded-lg shadow p-6">
+				<div class="flex items-center">
+					<form hx-post="/recipes" hx-target="#recipes" hx-swap="beforebegin">
+						<div class="grid grid-cols-3 gap-1 p-2">
+							<input
+								class="col-span-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+								placeholder="New recipe"
+								type="text"
+								name="recipeName"
+							/>
+							<input
+								class="bg-indigo-800 p-2 rounded text-white"
+								type="submit"
+								value="Add"
+							/>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	}
+}

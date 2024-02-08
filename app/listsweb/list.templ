@@ -1,0 +1,135 @@
+package listsweb
+
+import "fmt"
+import "github.com/joerdav/shopping-list/app/common"
+
+func recipeInList(recipeID string, list List) bool {
+	for _, r := range list.Recipes {
+		if r.ID == recipeID {
+			return true
+		}
+	}
+	return false
+}
+
+templ ListRecipes(
+	list List,
+	availableRecipes []Recipe,
+) {
+	for _, recipe := range list.Recipes {
+		<div class="grid grid-cols-3">
+			<p class="col-span-2">{ recipe.Name }</p>
+			@common.SetQuantity(fmt.Sprintf("/lists/%v/recipe", list.ID), "body", "recipeID", recipe.ID, recipe.Quantity)
+		</div>
+	}
+	<div>
+		<select
+			name="recipeID"
+			hx-trigger="change"
+			hx-put={ fmt.Sprintf("/lists/%v/recipe", list.ID) }
+			hx-target="body"
+			hx-swap="outerHTML"
+			hx-vals='{"quantity":"1"}'
+			class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+		>
+			<option value="">Select a recipe</option>
+			for _, v := range availableRecipes {
+				if !recipeInList(v.ID, list) {
+					<option value={ v.ID }>{ v.Name }</option>
+				}
+			}
+		</select>
+	</div>
+}
+
+func itemInList(itemID string, list List) bool {
+	for _, i := range list.Items {
+		if i.ID == itemID {
+			return true
+		}
+	}
+	return false
+}
+
+templ ListItems(list List, availableItems []Item) {
+	for _, item := range list.Items {
+		<div class="grid grid-cols-3">
+			<p class="col-span-2">{ item.Name }</p>
+			@common.SetQuantity(fmt.Sprintf("/lists/%v/item", list.ID), "body", "itemID", item.ID, item.Quantity)
+		</div>
+	}
+	<div>
+		<select
+			name="itemID"
+			hx-trigger="change"
+			hx-put={ fmt.Sprintf("/lists/%v/item", list.ID) }
+			hx-target="body"
+			hx-swap="outerHTML"
+			hx-vals='{"quantity":"1"}'
+			class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+		>
+			<option value="">Select an item</option>
+			for _, v := range availableItems {
+				if !itemInList(v.ID, list) {
+					<option value={ v.ID }>{ v.Name }</option>
+				}
+			}
+		</select>
+	</div>
+}
+
+templ ListPage(path string, list List, availableRecipes []Recipe, availableItems []Item) {
+	@common.Layout(list.CreatedDate.Format("List - 02 Jan 06 15:04"), path) {
+		<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+			<div class="bg-white rounded shadow py-2 px-6">
+				<h2 class="text-gray-900 font-bold pb-2 border-b border-b-gray-200">Recipes</h2>
+				<div class="py-2">
+					@ListRecipes(list, availableRecipes)
+				</div>
+			</div>
+			<div class="bg-white rounded shadow py-2 px-6">
+				<h2 class="text-gray-900 font-bold pb-2 border-b border-b-gray-200">Items</h2>
+				<div class="py-2">
+					@ListItems(list, availableItems)
+				</div>
+			</div>
+			for _, shop := range list.Shops {
+				<div class="bg-white rounded shadow py-2 px-6">
+					<h2 class="text-gray-900 font-bold pb-2 border-b border-b-gray-200">{ shop.Name }</h2>
+					<div class="py-2">
+						<div class="grid grid-cols-3 gap-1 p-2">
+							for _, i := range shop.Items {
+								<div class="border border-gray-100 rounded shadow p-2">{ i.Name } x { fmt.Sprint(i.Quantity) }</div>
+							}
+						</div>
+					</div>
+				</div>
+			}
+		</div>
+	}
+}
+
+templ ListsPage(path string, lists []ListSummary) {
+	@common.Layout("Lists", path) {
+		<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+			for _, l := range lists {
+				@common.Card(l.CreatedDate.Format("02 Jan 06 15:04")) {
+					<a class="bg-indigo-800 p-2 text-white rounded" href={ templ.SafeURL("/lists/" + l.ID) }>
+						View
+					</a>
+				}
+			}
+			@common.DottedCard() {
+				<form hx-post="/lists" hx-target="body" hx-swap="outerHTML">
+					<div class="grid grid-cols-3 gap-1 p-2">
+						<input
+							class="bg-indigo-800 p-2 rounded text-white"
+							type="submit"
+							value="New list"
+						/>
+					</div>
+				</form>
+			}
+		</div>
+	}
+}

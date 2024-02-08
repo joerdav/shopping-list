@@ -1,0 +1,33 @@
+package shopsweb
+
+import "github.com/joerdav/shopping-list/app/common"
+import "github.com/joerdav/shopping-list/app/itemsweb"
+
+templ ShopsPage(path string, shops []Shop) {
+	@common.Layout("Shops", path) {
+		<div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+			for _, s := range shops {
+				@common.Card(s.Name) {
+					@itemsweb.Items(s.ID, s.Items)
+				}
+			}
+			@common.DottedCard() {
+				<form hx-post="/shops" hx-target="body" hx-swap="outerHTML" hx-on::after-request="this.reset()">
+					<div class="grid grid-cols-3 gap-1 p-2">
+						<input
+							class="col-span-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+							placeholder="New shop"
+							type="text"
+							name="shopName"
+						/>
+						<input
+							class="bg-indigo-800 p-2 rounded text-white"
+							type="submit"
+							value="Add"
+						/>
+					</div>
+				</form>
+			}
+		</div>
+	}
+}
