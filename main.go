@@ -11,6 +11,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
 
 	"github.com/joerdav/shopping-list/app"
@@ -25,6 +26,9 @@ import (
 )
 
 func run() error {
+	if err := godotenv.Load(); err != nil {
+		return err
+	}
 	db, err := sql.Open("sqlite3", cmp.Or(os.Getenv("DB"), ":memory:"))
 	if err != nil {
 		return err
@@ -59,7 +63,7 @@ func seed(db *sql.DB) error {
 
 	// return if already shops exist
 	shopsList, err := shopsCore.QueryAll(context.Background())
-	if err != nil {	
+	if err != nil {
 		return err
 	}
 	if len(shopsList) > 0 {
