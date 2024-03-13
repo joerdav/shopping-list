@@ -12,7 +12,7 @@ var ErrNotFound = errors.New("shop not found")
 type Storer interface {
 	Create(context.Context, Shop) error
 	Query(context.Context, uuid.UUID) (Shop, error)
-	QueryAll(context.Context) ([]Shop, error)
+	QueryAll(context.Context, string) ([]Shop, error)
 }
 
 type Core struct {
@@ -25,8 +25,9 @@ func NewCore(storer Storer) *Core {
 
 func (c *Core) Create(ctx context.Context, s NewShop) (Shop, error) {
 	shop := Shop{
-		ID:   uuid.New(),
-		Name: s.Name,
+		ID:     uuid.New(),
+		Name:   s.Name,
+		UserID: s.UserID,
 	}
 	if err := c.storer.Create(ctx, shop); err != nil {
 		return Shop{}, err
@@ -38,6 +39,6 @@ func (c *Core) Query(ctx context.Context, id uuid.UUID) (Shop, error) {
 	return c.storer.Query(ctx, id)
 }
 
-func (c *Core) QueryAll(ctx context.Context) ([]Shop, error) {
-	return c.storer.QueryAll(ctx)
+func (c *Core) QueryAll(ctx context.Context, userID string) ([]Shop, error) {
+	return c.storer.QueryAll(ctx, userID)
 }

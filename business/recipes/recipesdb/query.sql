@@ -1,6 +1,6 @@
 -- name: CreateRecipe :exec
-INSERT INTO recipes (id, name)
-VALUES (?, ?);
+INSERT INTO recipes (id, name, user_id)
+VALUES (?, ?, ?);
 
 -- name: GetRecipe :one
 SELECT * FROM recipes
@@ -8,6 +8,7 @@ WHERE id = ? LIMIT 1;
 
 -- name: ListRecipes :many
 SELECT * FROM recipes
+WHERE user_id = ?
 ORDER BY name;
 
 -- name: SetIngredient :exec

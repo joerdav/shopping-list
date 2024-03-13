@@ -15,6 +15,7 @@ type Ingredient struct {
 }
 
 type Recipe struct {
-	ID   uuid.UUID
-	Name string
+	ID     uuid.UUID
+	UserID string
+	Name   string
 }

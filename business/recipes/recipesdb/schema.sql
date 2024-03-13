@@ -1,5 +1,6 @@
 CREATE TABLE recipes (
   id   text PRIMARY KEY,
+  user_id text not null,
   name text    NOT NULL
 );
 

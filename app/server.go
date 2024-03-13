@@ -3,7 +3,6 @@ package app
 import (
 	"database/sql"
 	"net/http"
-	"os"
 
 	"github.com/joerdav/shopping-list/app/authweb"
 	"github.com/joerdav/shopping-list/app/itemsweb"
@@ -13,21 +12,13 @@ import (
 )
 
 type server struct {
-	mux                *http.ServeMux
-	conn               *sql.DB
-	authProviderConfig authweb.Config
+	mux  *http.ServeMux
+	conn *sql.DB
 }
 
 func NewServer(conn *sql.DB) *server {
 	mux := http.NewServeMux()
-	authProviderConfig := authweb.Config{Providers: map[string]authweb.ProviderConfig{}}
-	authProviderConfig.Providers["google"] = authweb.ProviderConfig{
-		AuthURL:      "https://accounts.google.com/o/oauth2/v2/auth",
-		TokenURL:     "https://oauth2.googleapis.com/token",
-		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
-		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
-	}
-	s := &server{mux, conn, authProviderConfig}
+	s := &server{mux, conn}
 	s.Routes()
 	return s
 }
@@ -37,7 +28,7 @@ func (s *server) Routes() {
 	shopsweb.RegisterHandlers(s.mux, shopsweb.Config{Conn: s.conn})
 	itemsweb.RegisterHandlers(s.mux, itemsweb.Config{Conn: s.conn})
 	recipesweb.RegisterHandlers(s.mux, recipesweb.Config{Conn: s.conn})
-	authweb.RegisterHandlers(s.mux, s.authProviderConfig)
+	authweb.RegisterHandlers(s.mux, authweb.Config{Conn: s.conn})
 
 	s.mux.Handle("/public/", public())
 }

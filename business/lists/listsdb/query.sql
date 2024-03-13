@@ -1,6 +1,6 @@
 -- name: CreateList :exec
-INSERT INTO lists (id, created_date)
-VALUES (?, ?);
+INSERT INTO lists (id, created_date, user_id)
+VALUES (?, ?, ?);
 
 -- name: GetList :one
 SELECT * FROM lists
@@ -9,6 +9,7 @@ LIMIT 1;
 
 -- name: GetAllLists :many
 SELECT * FROM lists
+WHERE user_id = ?
 ORDER BY created_date DESC;
 
 -- name: SetItem :exec

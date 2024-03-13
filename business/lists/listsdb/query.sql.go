@@ -12,17 +12,18 @@ import (
 )
 
 const createList = `-- name: CreateList :exec
-INSERT INTO lists (id, created_date)
-VALUES (?, ?)
+INSERT INTO lists (id, created_date, user_id)
+VALUES (?, ?, ?)
 `
 
 type CreateListParams struct {
 	ID          uuid.UUID
 	CreatedDate int64
+	UserID      string
 }
 
 func (q *Queries) CreateList(ctx context.Context, arg CreateListParams) error {
-	_, err := q.db.ExecContext(ctx, createList, arg.ID, arg.CreatedDate)
+	_, err := q.db.ExecContext(ctx, createList, arg.ID, arg.CreatedDate, arg.UserID)
 	return err
 }
 
@@ -57,12 +58,13 @@ func (q *Queries) DeleteRecipe(ctx context.Context, arg DeleteRecipeParams) erro
 }
 
 const getAllLists = `-- name: GetAllLists :many
-SELECT id, created_date FROM lists
+SELECT id, user_id, created_date FROM lists
+WHERE user_id = ?
 ORDER BY created_date DESC
 `
 
-func (q *Queries) GetAllLists(ctx context.Context) ([]List, error) {
-	rows, err := q.db.QueryContext(ctx, getAllLists)
+func (q *Queries) GetAllLists(ctx context.Context, userID string) ([]List, error) {
+	rows, err := q.db.QueryContext(ctx, getAllLists, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +72,7 @@ func (q *Queries) GetAllLists(ctx context.Context) ([]List, error) {
 	var items []List
 	for rows.Next() {
 		var i List
-		if err := rows.Scan(&i.ID, &i.CreatedDate); err != nil {
+		if err := rows.Scan(&i.ID, &i.UserID, &i.CreatedDate); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -113,7 +115,7 @@ func (q *Queries) GetItemsByList(ctx context.Context, listID uuid.UUID) ([]ListI
 }
 
 const getList = `-- name: GetList :one
-SELECT id, created_date FROM lists
+SELECT id, user_id, created_date FROM lists
 WHERE id = ?
 LIMIT 1
 `
@@ -121,7 +123,7 @@ LIMIT 1
 func (q *Queries) GetList(ctx context.Context, id uuid.UUID) (List, error) {
 	row := q.db.QueryRowContext(ctx, getList, id)
 	var i List
-	err := row.Scan(&i.ID, &i.CreatedDate)
+	err := row.Scan(&i.ID, &i.UserID, &i.CreatedDate)
 	return i, err
 }
 

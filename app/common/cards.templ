@@ -20,7 +20,7 @@ templ DottedCard() {
 }
 
 templ SetQuantity(url, target, idName, id string, qty int) {
-	<div class="relative flex" >
+	<div class="relative flex">
 		<form hx-put={ url } hx-target={ target } hx-swap="outerHTML">
 			<input type="hidden" name={ idName } value={ id }/>
 			<input type="hidden" name="quantity" value={ fmt.Sprint(qty - 1) }/>

@@ -31,8 +31,9 @@ func (f *Storer) Migrate(ctx context.Context) error {
 
 func (f *Storer) Create(ctx context.Context, shop shops.Shop) error {
 	return f.store.CreateShop(ctx, CreateShopParams{
-		ID:   shop.ID,
-		Name: shop.Name,
+		ID:     shop.ID,
+		UserID: shop.UserID,
+		Name:   shop.Name,
 	})
 }
 
@@ -44,8 +45,8 @@ func (f *Storer) Query(ctx context.Context, id uuid.UUID) (shops.Shop, error) {
 	return toCoreShop(shop), nil
 }
 
-func (f *Storer) QueryAll(ctx context.Context) ([]shops.Shop, error) {
-	dshops, err := f.store.ListShops(ctx)
+func (f *Storer) QueryAll(ctx context.Context, userID string) ([]shops.Shop, error) {
+	dshops, err := f.store.ListShops(ctx, userID)
 	if err != nil {
 		return []shops.Shop{}, err
 	}
@@ -58,7 +59,8 @@ func (f *Storer) QueryAll(ctx context.Context) ([]shops.Shop, error) {
 
 func toCoreShop(s Shop) shops.Shop {
 	return shops.Shop{
-		ID:   s.ID,
-		Name: s.Name,
+		ID:     s.ID,
+		UserID: s.UserID,
+		Name:   s.Name,
 	}
 }

@@ -9,12 +9,11 @@ import (
 
 var ErrNotFound = errors.New("list not found")
 
-
 type Storer interface {
 	Create(context.Context, List) error
 	Update(context.Context, List) error
 	Query(context.Context, uuid.UUID) (List, error)
-	QueryAll(context.Context) ([]List, error)
+	QueryAll(context.Context, string) ([]List, error)
 }
 
 type Core struct {
@@ -45,6 +44,7 @@ func (c *Core) Update(ctx context.Context, s UpdateList) (List, error) {
 func (c *Core) Create(ctx context.Context, s NewList) (List, error) {
 	list := List{
 		ID:          uuid.New(),
+		UserID:      s.UserID,
 		CreatedDate: s.CreatedDate,
 		Recipes:     map[uuid.UUID]int{},
 		Items:       map[uuid.UUID]int{},
@@ -59,6 +59,6 @@ func (c *Core) Query(ctx context.Context, id uuid.UUID) (List, error) {
 	return c.storer.Query(ctx, id)
 }
 
-func (c *Core) QueryAll(ctx context.Context) ([]List, error) {
-	return c.storer.QueryAll(ctx)
+func (c *Core) QueryAll(ctx context.Context, userID string) ([]List, error) {
+	return c.storer.QueryAll(ctx, userID)
 }

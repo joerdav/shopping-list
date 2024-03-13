@@ -10,6 +10,7 @@ import (
 
 type List struct {
 	ID          uuid.UUID
+	UserID      string
 	CreatedDate int64
 }
 

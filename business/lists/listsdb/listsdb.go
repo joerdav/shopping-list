@@ -32,7 +32,8 @@ func (f *Storer) Migrate(ctx context.Context) error {
 
 func (f *Storer) Create(ctx context.Context, list lists.List) error {
 	return f.store.CreateList(ctx, CreateListParams{
-		ID:          list.ID,	
+		ID:          list.ID,
+		UserID:      list.UserID,
 		CreatedDate: list.CreatedDate.Unix(),
 	})
 }
@@ -42,7 +43,7 @@ func (f *Storer) Update(ctx context.Context, list lists.List) error {
 	if err != nil {
 		return err
 	}
-	items,err := f.store.GetItemsByList(ctx, list.ID)
+	items, err := f.store.GetItemsByList(ctx, list.ID)
 	if err != nil {
 		return err
 	}
@@ -53,7 +54,7 @@ func (f *Storer) Update(ctx context.Context, list lists.List) error {
 	defer tx.Rollback()
 	qtx := f.store.WithTx(tx)
 	// Update recipes
-	for recipeID, quantity := range list.Recipes {	
+	for recipeID, quantity := range list.Recipes {
 		if err := qtx.SetRecipe(ctx, SetRecipeParams{
 			ListID:   list.ID,
 			RecipeID: recipeID,
@@ -95,7 +96,6 @@ func (f *Storer) Update(ctx context.Context, list lists.List) error {
 		}
 	}
 
-
 	return tx.Commit()
 }
 
@@ -109,14 +109,14 @@ func (f *Storer) Query(ctx context.Context, id uuid.UUID) (lists.List, error) {
 		return lists.List{}, err
 	}
 	recipes, err := f.store.GetRecipesByList(ctx, id)
-	if err != nil {	
+	if err != nil {
 		return lists.List{}, err
 	}
 	return toCoreList(list, items, recipes), nil
 }
 
-func (f *Storer) QueryAll(ctx context.Context) ([]lists.List, error) {
-	listsList, err := f.store.GetAllLists(ctx)
+func (f *Storer) QueryAll(ctx context.Context, userID string) ([]lists.List, error) {
+	listsList, err := f.store.GetAllLists(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -135,10 +135,10 @@ func (f *Storer) QueryAll(ctx context.Context) ([]lists.List, error) {
 	return coreLists, nil
 }
 
-
 func toCoreList(list List, items []ListItem, recipes []ListRecipe) lists.List {
 	coreList := lists.List{
 		ID:          list.ID,
+		UserID:      list.UserID,
 		CreatedDate: time.Unix(list.CreatedDate, 0),
 		Items:       make(map[uuid.UUID]int),
 		Recipes:     make(map[uuid.UUID]int),

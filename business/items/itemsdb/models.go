@@ -11,5 +11,6 @@ import (
 type Item struct {
 	ID     uuid.UUID
 	Name   string
+	UserID string
 	ShopID uuid.UUID
 }

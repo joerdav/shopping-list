@@ -11,6 +11,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/joerdav/shopping-list/app/middleware"
+	"github.com/joerdav/shopping-list/business/auth"
 	"github.com/joerdav/shopping-list/business/items"
 	"github.com/joerdav/shopping-list/business/items/itemsdb"
 	"github.com/joerdav/shopping-list/business/lists"
@@ -19,6 +21,7 @@ import (
 	"github.com/joerdav/shopping-list/business/recipes/recipesdb"
 	"github.com/joerdav/shopping-list/business/shops"
 	"github.com/joerdav/shopping-list/business/shops/shopsdb"
+	"github.com/joerdav/shopping-list/foundation/routing"
 )
 
 type Config struct {
@@ -31,17 +34,34 @@ func RegisterHandlers(mux *http.ServeMux, config Config) {
 	recipeCore := recipes.NewCore(recipesdb.NewStorer(config.Conn))
 	shopCore := shops.NewCore(shopsdb.NewStorer(config.Conn))
 
-	mux.Handle("GET /{$}", listsListHandler(listCore))
-	mux.Handle("POST /lists", createListHandler(listCore))
-	mux.Handle("GET /lists/{listid}", getListHandler(listCore, itemsCore, recipeCore, shopCore))
-	mux.Handle("PUT /lists/{listid}/item", setListItemCountHandler(listCore, itemsCore))
-	mux.Handle("PUT /lists/{listid}/recipe", setListRecipeCountHandler(listCore, recipeCore))
+	authMiddleware := middleware.AuthMiddleware(auth.NewCore())
+
+	routing.RegisterRoute(mux, "GET /{$}", listsListHandler(listCore), authMiddleware)
+	routing.RegisterRoute(mux, "POST /lists", createListHandler(listCore), authMiddleware)
+	routing.RegisterRoute(
+		mux,
+		"GET /lists/{listid}",
+		getListHandler(listCore, itemsCore, recipeCore, shopCore),
+		authMiddleware,
+	)
+	routing.RegisterRoute(
+		mux,
+		"PUT /lists/{listid}/item",
+		setListItemCountHandler(listCore, itemsCore),
+		authMiddleware,
+	)
+	routing.RegisterRoute(
+		mux,
+		"PUT /lists/{listid}/recipe",
+		setListRecipeCountHandler(listCore, recipeCore),
+		authMiddleware,
+	)
 }
 
 func listsListHandler(listCore *lists.Core) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// get by user id
-		lists, err := listCore.QueryAll(r.Context())
+		userID := auth.UserID(r.Context())
+		lists, err := listCore.QueryAll(r.Context(), userID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -63,7 +83,8 @@ func listsListHandler(listCore *lists.Core) http.Handler {
 
 func createListHandler(listCore *lists.Core) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, err := listCore.Create(r.Context(), lists.NewList{CreatedDate: time.Now()})
+		userID := auth.UserID(r.Context())
+		_, err := listCore.Create(r.Context(), lists.NewList{CreatedDate: time.Now(), UserID: userID})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -74,8 +95,14 @@ func createListHandler(listCore *lists.Core) http.Handler {
 }
 
 // Move logic out
-func getListHandler(listCore *lists.Core, itemsCore *items.Core, recipeCore *recipes.Core, shopCore *shops.Core) http.Handler {
+func getListHandler(
+	listCore *lists.Core,
+	itemsCore *items.Core,
+	recipeCore *recipes.Core,
+	shopCore *shops.Core,
+) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userID := auth.UserID(r.Context())
 		listID, err := uuid.Parse(r.PathValue("listid"))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -88,6 +115,10 @@ func getListHandler(listCore *lists.Core, itemsCore *items.Core, recipeCore *rec
 		}
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if list.UserID != userID {
+			http.Error(w, "list not found", http.StatusNotFound)
 			return
 		}
 		listModel := List{
@@ -190,7 +221,7 @@ func getListHandler(listCore *lists.Core, itemsCore *items.Core, recipeCore *rec
 			return listModel.Shops[i].Name < listModel.Shops[j].Name
 		})
 		availableItems := []Item{}
-		citems, err := itemsCore.QueryAll(r.Context())
+		citems, err := itemsCore.QueryAll(r.Context(), userID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -202,7 +233,7 @@ func getListHandler(listCore *lists.Core, itemsCore *items.Core, recipeCore *rec
 			})
 		}
 		availableRecipes := []Recipe{}
-		crecipes, err := recipeCore.QueryAll(r.Context())
+		crecipes, err := recipeCore.QueryAll(r.Context(), userID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -223,6 +254,7 @@ func getListHandler(listCore *lists.Core, itemsCore *items.Core, recipeCore *rec
 // Move logic out
 func setListItemCountHandler(listCore *lists.Core, itemCore *items.Core) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userID := auth.UserID(r.Context())
 		listID, err := uuid.Parse(r.PathValue("listid"))
 		if err != nil {
 			// TODO: replace with error page
@@ -248,6 +280,10 @@ func setListItemCountHandler(listCore *lists.Core, itemCore *items.Core) http.Ha
 		}
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if list.UserID != userID {
+			http.Error(w, "list not found", http.StatusNotFound)
 			return
 		}
 		_, err = itemCore.Query(r.Context(), itemID)
@@ -279,6 +315,7 @@ func setListItemCountHandler(listCore *lists.Core, itemCore *items.Core) http.Ha
 // Move logic out
 func setListRecipeCountHandler(listCore *lists.Core, recipeCore *recipes.Core) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userID := auth.UserID(r.Context())
 		listID, err := uuid.Parse(r.PathValue("listid"))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -303,7 +340,10 @@ func setListRecipeCountHandler(listCore *lists.Core, recipeCore *recipes.Core) h
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		slog.Info("Loading recipe", "recipeID", recipeID)
+		if list.UserID != userID {
+			http.Error(w, "list not found", http.StatusNotFound)
+			return
+		}
 		_, err = recipeCore.Query(r.Context(), recipeID)
 		if errors.Is(err, recipes.ErrNotFound) {
 			http.Error(w, "recipe not found", http.StatusNotFound)

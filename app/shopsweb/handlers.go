@@ -6,10 +6,13 @@ import (
 	"net/http"
 	"sort"
 
+	"github.com/joerdav/shopping-list/app/middleware"
+	"github.com/joerdav/shopping-list/business/auth"
 	"github.com/joerdav/shopping-list/business/items"
 	"github.com/joerdav/shopping-list/business/items/itemsdb"
 	"github.com/joerdav/shopping-list/business/shops"
 	"github.com/joerdav/shopping-list/business/shops/shopsdb"
+	"github.com/joerdav/shopping-list/foundation/routing"
 )
 
 type Config struct {
@@ -20,8 +23,10 @@ func RegisterHandlers(mux *http.ServeMux, config Config) {
 	shopsCore := shops.NewCore(shopsdb.NewStorer(config.Conn))
 	itemsCore := items.NewCore(itemsdb.NewStorer(config.Conn))
 
-	mux.Handle("GET /shops", getShopsHandler(shopsCore, itemsCore))
-	mux.Handle("POST /shops", createShopHandler(shopsCore))
+	authMiddleware := middleware.AuthMiddleware(auth.NewCore())
+
+	routing.RegisterRoute(mux, "GET /shops", getShopsHandler(shopsCore, itemsCore), authMiddleware)
+	routing.RegisterRoute(mux, "POST /shops", createShopHandler(shopsCore), authMiddleware)
 }
 
 type Shop struct {
@@ -33,7 +38,8 @@ type Shop struct {
 func getShopsHandler(shopsCore *shops.Core, itemsCore *items.Core) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var shopModels []Shop
-		shops, err := shopsCore.QueryAll(r.Context())
+		userID := auth.UserID(r.Context())
+		shops, err := shopsCore.QueryAll(r.Context(), userID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -49,7 +55,10 @@ func getShopsHandler(shopsCore *shops.Core, itemsCore *items.Core) http.Handler 
 				return
 			}
 			for _, item := range items {
-				shopModels[len(shopModels)-1].Items = append(shopModels[len(shopModels)-1].Items, item.Name)
+				shopModels[len(shopModels)-1].Items = append(
+					shopModels[len(shopModels)-1].Items,
+					item.Name,
+				)
 			}
 			sort.Strings(shopModels[len(shopModels)-1].Items)
 		}
@@ -58,8 +67,10 @@ func getShopsHandler(shopsCore *shops.Core, itemsCore *items.Core) http.Handler 
 		}
 	})
 }
+
 func createShopHandler(shopsCore *shops.Core) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userID := auth.UserID(r.Context())
 		if err := r.ParseForm(); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
@@ -70,7 +81,7 @@ func createShopHandler(shopsCore *shops.Core) http.Handler {
 			return
 		}
 		slog.Info("Creating shop", "shopName", shopName)
-		_, err := shopsCore.Create(r.Context(), shops.NewShop{Name: shopName})
+		_, err := shopsCore.Create(r.Context(), shops.NewShop{Name: shopName, UserID: userID})
 		if err != nil {
 			slog.Error("Failed to create shop", "error", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)

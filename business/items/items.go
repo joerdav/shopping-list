@@ -12,18 +12,20 @@ var ErrNotFound = errors.New("item not found")
 type NewItem struct {
 	Name   string
 	ShopID uuid.UUID
+	UserID string
 }
 
 type Item struct {
 	ID     uuid.UUID
 	Name   string
 	ShopID uuid.UUID
+	UserID string
 }
 
 type Storer interface {
 	Create(context.Context, Item) error
 	Query(context.Context, uuid.UUID) (Item, error)
-	QueryAll(context.Context) ([]Item, error)
+	QueryAll(context.Context, string) ([]Item, error)
 	QueryAllByShopID(context.Context, uuid.UUID) ([]Item, error)
 }
 
@@ -37,8 +39,9 @@ func NewCore(storer Storer) *Core {
 
 func (c *Core) Create(ctx context.Context, s NewItem) (Item, error) {
 	item := Item{
-		ID:   uuid.New(),
-		Name: s.Name,
+		ID:     uuid.New(),
+		Name:   s.Name,
+		UserID: s.UserID,
 		ShopID: s.ShopID,
 	}
 	if err := c.storer.Create(ctx, item); err != nil {
@@ -51,8 +54,8 @@ func (c *Core) Query(ctx context.Context, id uuid.UUID) (Item, error) {
 	return c.storer.Query(ctx, id)
 }
 
-func (c *Core) QueryAll(ctx context.Context) ([]Item, error) {
-	return c.storer.QueryAll(ctx)
+func (c *Core) QueryAll(ctx context.Context, userID string) ([]Item, error) {
+	return c.storer.QueryAll(ctx, userID)
 }
 
 func (c *Core) QueryByShopID(ctx context.Context, shopID uuid.UUID) ([]Item, error) {

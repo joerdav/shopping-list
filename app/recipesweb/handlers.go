@@ -3,15 +3,19 @@ package recipesweb
 import (
 	"database/sql"
 	"errors"
+	"log/slog"
 	"net/http"
 	"sort"
 	"strconv"
 
 	"github.com/google/uuid"
+	"github.com/joerdav/shopping-list/app/middleware"
+	"github.com/joerdav/shopping-list/business/auth"
 	"github.com/joerdav/shopping-list/business/items"
 	"github.com/joerdav/shopping-list/business/items/itemsdb"
 	"github.com/joerdav/shopping-list/business/recipes"
 	"github.com/joerdav/shopping-list/business/recipes/recipesdb"
+	"github.com/joerdav/shopping-list/foundation/routing"
 )
 
 type Config struct {
@@ -22,9 +26,26 @@ func RegisterHandlers(mux *http.ServeMux, config Config) {
 	recipeCore := recipes.NewCore(recipesdb.NewStorer(config.Conn))
 	itemsCore := items.NewCore(itemsdb.NewStorer(config.Conn))
 
-	mux.Handle("GET /recipes", getRecipesHandler(recipeCore, itemsCore))
-	mux.Handle("POST /recipes", createRecipeHandler(recipeCore, itemsCore))
-	mux.Handle("PUT /recipes/{recipeid}", setIngredientsHandler(recipeCore, itemsCore))
+	authMiddleware := middleware.AuthMiddleware(auth.NewCore())
+
+	routing.RegisterRoute(
+		mux,
+		"GET /recipes",
+		getRecipesHandler(recipeCore, itemsCore),
+		authMiddleware,
+	)
+	routing.RegisterRoute(
+		mux,
+		"POST /recipes",
+		createRecipeHandler(recipeCore, itemsCore),
+		authMiddleware,
+	)
+	routing.RegisterRoute(
+		mux,
+		"PUT /recipes/{recipeid}",
+		setIngredientsHandler(recipeCore, itemsCore),
+		authMiddleware,
+	)
 }
 
 type Item struct {
@@ -46,7 +67,8 @@ type Recipe struct {
 
 func getRecipesHandler(recipeCore *recipes.Core, itemsCore *items.Core) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		recipes, err := recipeCore.QueryAll(r.Context())
+		userID := auth.UserID(r.Context())
+		recipes, err := recipeCore.QueryAll(r.Context(), userID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -78,11 +100,12 @@ func getRecipesHandler(recipeCore *recipes.Core, itemsCore *items.Core) http.Han
 			return recipeModels[i].Name < recipeModels[j].Name
 		})
 		var availableIngredients []Item
-		ingredients, err := itemsCore.QueryAll(r.Context())
+		ingredients, err := itemsCore.QueryAll(r.Context(), auth.UserID(r.Context()))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		slog.Info("available ingredients", "ingredients", ingredients)
 		for _, item := range ingredients {
 			availableIngredients = append(availableIngredients, Item{
 				ID:   item.ID.String(),
@@ -98,8 +121,10 @@ func getRecipesHandler(recipeCore *recipes.Core, itemsCore *items.Core) http.Han
 		}
 	})
 }
+
 func createRecipeHandler(recipeCore *recipes.Core, itemsCore *items.Core) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userID := auth.UserID(r.Context())
 		if err := r.ParseForm(); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
@@ -109,13 +134,13 @@ func createRecipeHandler(recipeCore *recipes.Core, itemsCore *items.Core) http.H
 			http.Error(w, "recipeName is required", http.StatusBadRequest)
 			return
 		}
-		recipe, err := recipeCore.Create(r.Context(), recipes.NewRecipe{Name: recipeName})
+		recipe, err := recipeCore.Create(r.Context(), recipes.NewRecipe{Name: recipeName, UserID: userID})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		var availableIngredients []Item
-		ingredients, err := itemsCore.QueryAll(r.Context())
+		ingredients, err := itemsCore.QueryAll(r.Context(), auth.UserID(r.Context()))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -135,8 +160,10 @@ func createRecipeHandler(recipeCore *recipes.Core, itemsCore *items.Core) http.H
 		}
 	})
 }
+
 func setIngredientsHandler(recipeCore *recipes.Core, itemsCore *items.Core) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userID := auth.UserID(r.Context())
 		quantity, err := strconv.Atoi(r.FormValue("quantity"))
 		if err != nil {
 			http.Error(w, "invalid quantity", http.StatusBadRequest)
@@ -161,7 +188,11 @@ func setIngredientsHandler(recipeCore *recipes.Core, itemsCore *items.Core) http
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		_, err = itemsCore.Query(r.Context(), itemID)
+		if recipe.UserID != userID {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+		item, err := itemsCore.Query(r.Context(), itemID)
 		if errors.Is(err, items.ErrNotFound) {
 			http.Error(w, "item does not exist", http.StatusBadRequest)
 			return
@@ -170,14 +201,22 @@ func setIngredientsHandler(recipeCore *recipes.Core, itemsCore *items.Core) http
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		if item.UserID != userID {
+			http.Error(w, "item does not exist", http.StatusBadRequest)
+			return
+		}
 		recipe.Ingredients[itemID] = quantity
 		if quantity == 0 {
 			delete(recipe.Ingredients, itemID)
 		}
-		recipeCore.Update(r.Context(), recipes.UpdateRecipe{
+		_, err = recipeCore.Update(r.Context(), recipes.UpdateRecipe{
 			ID:          recipeID,
 			Ingredients: &recipe.Ingredients,
 		})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		recipeModel := Recipe{
 			ID:   recipe.ID.String(),
 			Name: recipe.Name,
@@ -198,7 +237,7 @@ func setIngredientsHandler(recipeCore *recipes.Core, itemsCore *items.Core) http
 			return recipeModel.Ingredients[i].Name < recipeModel.Ingredients[j].Name
 		})
 		var availableIngredients []Item
-		ingredients, err := itemsCore.QueryAll(r.Context())
+		ingredients, err := itemsCore.QueryAll(r.Context(), userID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

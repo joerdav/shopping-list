@@ -12,40 +12,52 @@ import (
 )
 
 const createItem = `-- name: CreateItem :exec
-INSERT INTO items (id, name, shop_id)
-VALUES (?, ?, ?)
+INSERT INTO items (id, name, shop_id, user_id)
+VALUES (?, ?, ?, ?)
 `
 
 type CreateItemParams struct {
 	ID     uuid.UUID
 	Name   string
 	ShopID uuid.UUID
+	UserID string
 }
 
 func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) error {
-	_, err := q.db.ExecContext(ctx, createItem, arg.ID, arg.Name, arg.ShopID)
+	_, err := q.db.ExecContext(ctx, createItem,
+		arg.ID,
+		arg.Name,
+		arg.ShopID,
+		arg.UserID,
+	)
 	return err
 }
 
 const getItem = `-- name: GetItem :one
-SELECT id, name, shop_id FROM items
+SELECT id, name, user_id, shop_id FROM items
 WHERE id = ? LIMIT 1
 `
 
 func (q *Queries) GetItem(ctx context.Context, id uuid.UUID) (Item, error) {
 	row := q.db.QueryRowContext(ctx, getItem, id)
 	var i Item
-	err := row.Scan(&i.ID, &i.Name, &i.ShopID)
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.UserID,
+		&i.ShopID,
+	)
 	return i, err
 }
 
 const listItems = `-- name: ListItems :many
-SELECT id, name, shop_id FROM items
+SELECT id, name, user_id, shop_id FROM items
+WHERE user_id = ?
 ORDER BY name
 `
 
-func (q *Queries) ListItems(ctx context.Context) ([]Item, error) {
-	rows, err := q.db.QueryContext(ctx, listItems)
+func (q *Queries) ListItems(ctx context.Context, userID string) ([]Item, error) {
+	rows, err := q.db.QueryContext(ctx, listItems, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +65,12 @@ func (q *Queries) ListItems(ctx context.Context) ([]Item, error) {
 	var items []Item
 	for rows.Next() {
 		var i Item
-		if err := rows.Scan(&i.ID, &i.Name, &i.ShopID); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.UserID,
+			&i.ShopID,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -68,7 +85,7 @@ func (q *Queries) ListItems(ctx context.Context) ([]Item, error) {
 }
 
 const listItemsByShop = `-- name: ListItemsByShop :many
-SELECT id, name, shop_id FROM items
+SELECT id, name, user_id, shop_id FROM items
 WHERE shop_id = ?
 ORDER BY name
 `
@@ -82,7 +99,12 @@ func (q *Queries) ListItemsByShop(ctx context.Context, shopID uuid.UUID) ([]Item
 	var items []Item
 	for rows.Next() {
 		var i Item
-		if err := rows.Scan(&i.ID, &i.Name, &i.ShopID); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.UserID,
+			&i.ShopID,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

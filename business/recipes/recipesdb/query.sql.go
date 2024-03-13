@@ -12,17 +12,18 @@ import (
 )
 
 const createRecipe = `-- name: CreateRecipe :exec
-INSERT INTO recipes (id, name)
-VALUES (?, ?)
+INSERT INTO recipes (id, name, user_id)
+VALUES (?, ?, ?)
 `
 
 type CreateRecipeParams struct {
-	ID   uuid.UUID
-	Name string
+	ID     uuid.UUID
+	Name   string
+	UserID string
 }
 
 func (q *Queries) CreateRecipe(ctx context.Context, arg CreateRecipeParams) error {
-	_, err := q.db.ExecContext(ctx, createRecipe, arg.ID, arg.Name)
+	_, err := q.db.ExecContext(ctx, createRecipe, arg.ID, arg.Name, arg.UserID)
 	return err
 }
 
@@ -42,14 +43,14 @@ func (q *Queries) DeleteIngredient(ctx context.Context, arg DeleteIngredientPara
 }
 
 const getRecipe = `-- name: GetRecipe :one
-SELECT id, name FROM recipes
+SELECT id, user_id, name FROM recipes
 WHERE id = ? LIMIT 1
 `
 
 func (q *Queries) GetRecipe(ctx context.Context, id uuid.UUID) (Recipe, error) {
 	row := q.db.QueryRowContext(ctx, getRecipe, id)
 	var i Recipe
-	err := row.Scan(&i.ID, &i.Name)
+	err := row.Scan(&i.ID, &i.UserID, &i.Name)
 	return i, err
 }
 
@@ -82,12 +83,13 @@ func (q *Queries) ListIngredientsByRecipe(ctx context.Context, recipeID uuid.UUI
 }
 
 const listRecipes = `-- name: ListRecipes :many
-SELECT id, name FROM recipes
+SELECT id, user_id, name FROM recipes
+WHERE user_id = ?
 ORDER BY name
 `
 
-func (q *Queries) ListRecipes(ctx context.Context) ([]Recipe, error) {
-	rows, err := q.db.QueryContext(ctx, listRecipes)
+func (q *Queries) ListRecipes(ctx context.Context, userID string) ([]Recipe, error) {
+	rows, err := q.db.QueryContext(ctx, listRecipes, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +97,7 @@ func (q *Queries) ListRecipes(ctx context.Context) ([]Recipe, error) {
 	var items []Recipe
 	for rows.Next() {
 		var i Recipe
-		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+		if err := rows.Scan(&i.ID, &i.UserID, &i.Name); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

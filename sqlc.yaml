@@ -1,6 +1,12 @@
 version: "2"
 sql:
   - engine: "sqlite"
+    queries: "./business/users/usersdb/query.sql"
+    schema: "./business/users/usersdb/schema.sql"
+    gen:
+      go:
+        out: "./business/users/usersdb"
+  - engine: "sqlite"
     queries: "./business/shops/shopsdb/query.sql"
     schema: "./business/shops/shopsdb/schema.sql"
     gen:

@@ -9,6 +9,7 @@ import (
 )
 
 type Shop struct {
-	ID   uuid.UUID
-	Name string
+	ID     uuid.UUID
+	UserID string
+	Name   string
 }

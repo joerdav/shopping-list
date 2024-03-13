@@ -2,91 +2,45 @@ package authweb
 
 import (
 	"bytes"
-	"crypto/rand"
-	"encoding/base32"
+	"database/sql"
+	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"log/slog"
 	"net/http"
+	"os"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/joerdav/shopping-list/business/auth"
+	"github.com/joerdav/shopping-list/business/users"
+	"github.com/joerdav/shopping-list/business/users/usersdb"
 )
 
-type state struct {
-	Provider  string `json:"provider"`
-	ReturnUrl string `json:"returnUrl"`
-	Challenge string `json:"challenge"`
-}
-
-type ProviderConfig struct {
-	ClientID     string
-	ClientSecret string
-	AuthURL      string
-	TokenURL     string
-}
-
 type Config struct {
-	Providers map[string]ProviderConfig
+	Conn *sql.DB
 }
 
-func RegisterHandlers(mux *http.ServeMux, config Config) {
-	mux.Handle("GET /auth/{provider}/signin", signinHandler(config.Providers))
-	mux.Handle("GET /auth/redirect", redirectHandler())
+func RegisterHandlers(mux *http.ServeMux, cfg Config) {
+	authCore := auth.NewCore()
+	userCore := users.NewCore(usersdb.NewStorer(cfg.Conn))
+
+	mux.Handle("GET /auth/{provider}/signin", signinHandler(authCore))
+	mux.Handle("GET /auth/redirect", redirectHandler(authCore, userCore))
 }
 
-func generateUrl(provider ProviderConfig, domain, state string) string {
-	return provider.AuthURL +
-		"?client_id=" + provider.ClientID +
-		"&redirect_uri=" + domain + "/auth/redirect" +
-		"&response_type=code" +
-		"&scope=profile" +
-		"&state=" + state
-}
-
-func generateRandomString() string {
-	bytes := make([]byte, 12)
-	rand.Read(bytes)
-	return base32.StdEncoding.EncodeToString(bytes)
-}
-
-func generateState(provider, returnUrl string) (string, error) {
-	challenge := generateRandomString()
-	state := state{
-		Provider:  provider,
-		ReturnUrl: returnUrl,
-		Challenge: challenge,
-	}
-	var b bytes.Buffer
-	if err := json.NewEncoder(&b).Encode(state); err != nil {
-		return "", err
-	}
-	return base32.StdEncoding.EncodeToString(b.Bytes()), nil
-}
-
-func parseState(s string) (state, error) {
-	b, err := base32.StdEncoding.DecodeString(s)
-	if err != nil {
-		return state{}, err
-	}
-	var st state
-	if err := json.NewDecoder(bytes.NewReader(b)).Decode(&st); err != nil {
-		return state{}, err
-	}
-	return st, nil
-}
-
-func signinHandler(providers map[string]ProviderConfig) http.HandlerFunc {
+func signinHandler(authCore *auth.Core) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		providerID := r.PathValue("provider")
-		provider, ok := providers[providerID]
-		if !ok {
-			http.Error(w, "unknown provider", http.StatusBadRequest)
-			return
-		}
-		state, err := generateState(providerID, r.URL.Query().Get("returnUrl"))
+		url, state, err := authCore.SigninUrl(
+			providerID,
+			os.Getenv("HOST"),
+			r.URL.Query().Get("returnUrl"),
+		)
 		if err != nil {
-			slog.Error("failed to generate state", "error", err)
-			http.Error(w, "failed to generate state", http.StatusInternalServerError)
+			slog.Error("failed to get signin url", "error", err)
+			http.Error(w, "failed to get signin url", http.StatusInternalServerError)
 			return
 		}
-		url := generateUrl(provider, "http://localhost:7331", state)
 		http.SetCookie(w, &http.Cookie{
 			Name:     "state",
 			Value:    state,
@@ -95,12 +49,11 @@ func signinHandler(providers map[string]ProviderConfig) http.HandlerFunc {
 			// Secure:   true,
 			SameSite: http.SameSiteLaxMode,
 		})
-
-		http.Redirect(w, r, url, http.StatusFound)
+		http.Redirect(w, r, url.String(), http.StatusFound)
 	})
 }
 
-func redirectHandler() http.HandlerFunc {
+func redirectHandler(authCore *auth.Core, userCore *users.Core) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		code := r.URL.Query().Get("code")
 		stateString := r.URL.Query().Get("state")
@@ -111,17 +64,57 @@ func redirectHandler() http.HandlerFunc {
 			http.Error(w, "failed to get state cookie", http.StatusInternalServerError)
 			return
 		}
-		if stateString == "" || stateString != cookie.Value {
-			slog.Error("state mismatch", "state", stateString, "cookie", cookie.Value)
-			http.Error(w, "state mismatch", http.StatusBadRequest)
-			return
-		}
-		state, err := parseState(stateString)
+		token, returnTo, err := authCore.ExchangeCodeForToken(
+			r.Context(),
+			code,
+			stateString,
+			cookie.Value,
+		)
 		if err != nil {
-			slog.Error("failed to parse state", "error", err)
-			http.Error(w, "failed to parse state", http.StatusInternalServerError)
+			slog.Error("failed to exchange code for token", "error", err)
+			http.Error(w, "failed to exchange code for token", http.StatusInternalServerError)
 			return
 		}
-		slog.Info("logged in", "code", code, "state", state.Provider)
+		t, err := authCore.ValidateIDToken(r.Context(), token)
+		if err != nil {
+			slog.Error("failed to validate token", "error", err)
+			http.Error(w, "failed to validate token", http.StatusInternalServerError)
+			return
+		}
+
+		var b bytes.Buffer
+		if err := json.NewEncoder(&b).Encode(token); err != nil {
+			slog.Error("failed to encode token", "error", err)
+			http.Error(w, "failed to encode token", http.StatusInternalServerError)
+			return
+		}
+		newCookie := http.Cookie{
+			Name:     "token",
+			Value:    base64.StdEncoding.EncodeToString(b.Bytes()),
+			HttpOnly: true,
+			Path:     "/",
+			// Secure:   true,
+			SameSite: http.SameSiteLaxMode,
+		}
+		userID := t.Claims.(jwt.MapClaims)["sub"].(string)
+		_, err = userCore.Query(r.Context(), userID)
+		if err != nil && !errors.Is(err, users.ErrNotFound) {
+			slog.Error("failed to get user", "error", err)
+			http.Error(w, "failed to get user", http.StatusInternalServerError)
+			return
+		}
+		if err == nil {
+			http.SetCookie(w, &newCookie)
+			http.Redirect(w, r, returnTo, http.StatusFound)
+			return
+		}
+		_, err = userCore.Create(r.Context(), users.User{userID})
+		if err != nil {
+			slog.Error("failed to create user", "error", err)
+			http.Error(w, "failed to create user", http.StatusInternalServerError)
+			return
+		}
+		http.SetCookie(w, &newCookie)
+		http.Redirect(w, r, returnTo, http.StatusFound)
 	})
 }

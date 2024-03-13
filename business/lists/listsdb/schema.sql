@@ -1,7 +1,11 @@
 CREATE TABLE lists (
 	id   text primary key,
-	created_date integer not null
+	user_id text not null,
+	created_date integer not null,
+	FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+CREATE INDEX lists_by_user ON lists (user_id);
 
 CREATE TABLE list_items (
 	item_id text not null,

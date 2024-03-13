@@ -33,6 +33,7 @@ func (f *Storer) Create(ctx context.Context, item items.Item) error {
 	return f.store.CreateItem(ctx, CreateItemParams{
 		ID:     item.ID,
 		Name:   item.Name,
+		UserID: item.UserID,
 		ShopID: item.ShopID,
 	})
 }
@@ -57,8 +58,8 @@ func (f *Storer) Query(ctx context.Context, id uuid.UUID) (items.Item, error) {
 	return toCoreItem(item), nil
 }
 
-func (f *Storer) QueryAll(ctx context.Context) ([]items.Item, error) {
-	ditems, err := f.store.ListItems(ctx)
+func (f *Storer) QueryAll(ctx context.Context, userID string) ([]items.Item, error) {
+	ditems, err := f.store.ListItems(ctx, userID)
 	if err != nil {
 		return []items.Item{}, err
 	}
@@ -73,6 +74,7 @@ func toCoreItem(s Item) items.Item {
 	return items.Item{
 		ID:     s.ID,
 		Name:   s.Name,
+		UserID: s.UserID,
 		ShopID: s.ShopID,
 	}
 }

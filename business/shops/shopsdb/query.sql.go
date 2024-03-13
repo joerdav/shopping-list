@@ -12,17 +12,18 @@ import (
 )
 
 const createShop = `-- name: CreateShop :exec
-INSERT INTO shops (id, name)
-VALUES (?, ?)
+INSERT INTO shops (id, name, user_id)
+VALUES (?, ?, ?)
 `
 
 type CreateShopParams struct {
-	ID   uuid.UUID
-	Name string
+	ID     uuid.UUID
+	Name   string
+	UserID string
 }
 
 func (q *Queries) CreateShop(ctx context.Context, arg CreateShopParams) error {
-	_, err := q.db.ExecContext(ctx, createShop, arg.ID, arg.Name)
+	_, err := q.db.ExecContext(ctx, createShop, arg.ID, arg.Name, arg.UserID)
 	return err
 }
 
@@ -37,24 +38,25 @@ func (q *Queries) DeleteShop(ctx context.Context, id uuid.UUID) error {
 }
 
 const getShop = `-- name: GetShop :one
-SELECT id, name FROM shops
+SELECT id, user_id, name FROM shops
 WHERE id = ? LIMIT 1
 `
 
 func (q *Queries) GetShop(ctx context.Context, id uuid.UUID) (Shop, error) {
 	row := q.db.QueryRowContext(ctx, getShop, id)
 	var i Shop
-	err := row.Scan(&i.ID, &i.Name)
+	err := row.Scan(&i.ID, &i.UserID, &i.Name)
 	return i, err
 }
 
 const listShops = `-- name: ListShops :many
-SELECT id, name FROM shops
+SELECT id, user_id, name FROM shops
+WHERE user_id = ?
 ORDER BY name
 `
 
-func (q *Queries) ListShops(ctx context.Context) ([]Shop, error) {
-	rows, err := q.db.QueryContext(ctx, listShops)
+func (q *Queries) ListShops(ctx context.Context, userID string) ([]Shop, error) {
+	rows, err := q.db.QueryContext(ctx, listShops, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +64,7 @@ func (q *Queries) ListShops(ctx context.Context) ([]Shop, error) {
 	var items []Shop
 	for rows.Next() {
 		var i Shop
-		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+		if err := rows.Scan(&i.ID, &i.UserID, &i.Name); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

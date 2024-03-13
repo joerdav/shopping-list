@@ -31,10 +31,12 @@ func (f *Storer) Migrate(ctx context.Context) error {
 
 func (f *Storer) Create(ctx context.Context, recipe recipes.Recipe) error {
 	return f.store.CreateRecipe(ctx, CreateRecipeParams{
-		ID:   recipe.ID,
-		Name: recipe.Name,
+		ID:     recipe.ID,
+		UserID: recipe.UserID,
+		Name:   recipe.Name,
 	})
 }
+
 func (f *Storer) Update(ctx context.Context, recipe recipes.Recipe) error {
 	ingredients, err := f.store.ListIngredientsByRecipe(ctx, recipe.ID)
 	if err != nil {
@@ -82,8 +84,8 @@ func (f *Storer) Query(ctx context.Context, id uuid.UUID) (recipes.Recipe, error
 	return cr, nil
 }
 
-func (f *Storer) QueryAll(ctx context.Context) ([]recipes.Recipe, error) {
-	recipesList, err := f.store.ListRecipes(ctx)
+func (f *Storer) QueryAll(ctx context.Context, userID string) ([]recipes.Recipe, error) {
+	recipesList, err := f.store.ListRecipes(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -101,10 +103,12 @@ func (f *Storer) QueryAll(ctx context.Context) ([]recipes.Recipe, error) {
 func toCoreRecipe(r Recipe, is []Ingredient) recipes.Recipe {
 	return recipes.Recipe{
 		ID:          r.ID,
+		UserID:      r.UserID,
 		Name:        r.Name,
 		Ingredients: toCoreIngredients(is),
 	}
 }
+
 func toCoreIngredients(ingredients []Ingredient) map[uuid.UUID]int {
 	out := map[uuid.UUID]int{}
 	for _, i := range ingredients {
