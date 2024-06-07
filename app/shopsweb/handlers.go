@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"sort"
 
+	"github.com/joerdav/shopping-list/app/itemsweb"
 	"github.com/joerdav/shopping-list/app/middleware"
 	"github.com/joerdav/shopping-list/business/auth"
 	"github.com/joerdav/shopping-list/business/items"
@@ -32,7 +33,7 @@ func RegisterHandlers(mux *http.ServeMux, config Config) {
 type Shop struct {
 	ID    string
 	Name  string
-	Items []string
+	Items []itemsweb.Item
 }
 
 func getShopsHandler(shopsCore *shops.Core, itemsCore *items.Core) http.Handler {
@@ -49,18 +50,21 @@ func getShopsHandler(shopsCore *shops.Core, itemsCore *items.Core) http.Handler 
 				ID:   shop.ID.String(),
 				Name: shop.Name,
 			})
+			shopModel := &shopModels[len(shopModels)-1]
 			items, err := itemsCore.QueryByShopID(r.Context(), shop.ID)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
 			for _, item := range items {
-				shopModels[len(shopModels)-1].Items = append(
-					shopModels[len(shopModels)-1].Items,
-					item.Name,
+				shopModel.Items = append(
+					shopModel.Items,
+					itemsweb.Item{ID: item.ID.String(), Name: item.Name},
 				)
 			}
-			sort.Strings(shopModels[len(shopModels)-1].Items)
+			sort.Slice(shopModel.Items, func(i, j int) bool {
+				return shopModel.Items[i].Name < shopModel.Items[j].Name
+			})
 		}
 		if err := ShopsPage(r.URL.Path, shopModels).Render(r.Context(), w); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -117,3 +117,29 @@ func (q *Queries) ListItemsByShop(ctx context.Context, shopID uuid.UUID) ([]Item
 	}
 	return items, nil
 }
+
+const updateItem = `-- name: UpdateItem :one
+UPDATE items
+set name = ?,
+shop_id = ?
+WHERE id = ?
+RETURNING id, name, user_id, shop_id
+`
+
+type UpdateItemParams struct {
+	Name   string
+	ShopID uuid.UUID
+	ID     uuid.UUID
+}
+
+func (q *Queries) UpdateItem(ctx context.Context, arg UpdateItemParams) (Item, error) {
+	row := q.db.QueryRowContext(ctx, updateItem, arg.Name, arg.ShopID, arg.ID)
+	var i Item
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.UserID,
+		&i.ShopID,
+	)
+	return i, err
+}

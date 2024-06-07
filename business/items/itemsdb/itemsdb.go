@@ -70,6 +70,18 @@ func (f *Storer) QueryAll(ctx context.Context, userID string) ([]items.Item, err
 	return items, nil
 }
 
+func (f *Storer) Update(ctx context.Context, p items.Item) (items.Item, error) {
+	item, err := f.store.UpdateItem(ctx, UpdateItemParams{
+		Name:   p.Name,
+		ShopID: p.ShopID,
+		ID:     p.ID,
+	})
+	if err != nil {
+		return items.Item{}, err
+	}
+	return toCoreItem(item), nil
+}
+
 func toCoreItem(s Item) items.Item {
 	return items.Item{
 		ID:     s.ID,

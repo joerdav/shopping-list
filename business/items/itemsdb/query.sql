@@ -16,3 +16,9 @@ SELECT * FROM items
 WHERE shop_id = ?
 ORDER BY name;
 
+-- name: UpdateItem :one
+UPDATE items
+set name = ?,
+shop_id = ?
+WHERE id = ?
+RETURNING *;

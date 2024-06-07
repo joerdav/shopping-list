@@ -2,17 +2,67 @@ package itemsweb
 
 import "fmt"
 
-templ item(name string) {
-	<div class="border border-gray-100 rounded shadow p-2">{ name }</div>
+type Item struct {
+	ID, Name string
 }
 
-templ Items(shopID string, items []string) {
-	<div>
-		<div class="grid grid-cols-3 gap-1 p-2" id={ fmt.Sprintf("shop-items-%v", shopID) }>
-			for _, i := range items {
-				@item(i)
-			}
+templ draggable() {
+	<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path d="M8.5 10a2 2 0 1 0 2 2a2 2 0 0 0-2-2m0 7a2 2 0 1 0 2 2a2 2 0 0 0-2-2m7-10a2 2 0 1 0-2-2a2 2 0 0 0 2 2m-7-4a2 2 0 1 0 2 2a2 2 0 0 0-2-2m7 14a2 2 0 1 0 2 2a2 2 0 0 0-2-2m0-7a2 2 0 1 0 2 2a2 2 0 0 0-2-2"></path></svg>
+}
+
+templ item(i Item) {
+	<div class="border border-gray-100 rounded shadow p-2 cursor-grab flex">
+		<div class="py-2 fill-gray-400">
+			@draggable()
 		</div>
+		<div class="py-1 px-2">
+			<input type="hidden" name="item" value={ i.ID }/>
+			{ i.Name }
+		</div>
+	</div>
+}
+
+templ itemList(shopID string, items []Item) {
+	<input type="hidden" name="shopID" value={ shopID }/>
+	for _, i := range items {
+		@item(i)
+	}
+}
+
+templ Items(shopID string, items []Item) {
+	<div>
+		<form hx-post="/items/swap" hx-trigger="added" class="grid grid-cols-3 gap-1 p-2" id={ fmt.Sprintf("shop-items-%v", shopID) }>
+			@itemList(shopID, items)
+		</form>
+		<script>
+			(function () {
+				let target = me("-")
+				let sortable = new Sortable(target, {
+					animation: 150,
+					ghostClass: 'blue-background-class',
+					sort: false,
+					group: "items",
+
+					// Make the `.htmx-indicator` unsortable
+					filter: ".htmx-indicator",
+					onMove: function (evt) {
+						return evt.related.className.indexOf('htmx-indicator') === -1;
+					},
+
+					// Disable sorting on the `end` event
+					onEnd: function (evt) {
+					},
+					onAdd: function (evt) {
+						this.option("disabled", true);
+						evt.item.querySelector("input").name = "added"
+						target.dispatchEvent(new Event('added', evt));
+					}
+				});
+				target.addEventListener("htmx:afterSwap", function() {
+					sortable.option("disabled", false);
+				})
+			})();
+		</script>
 		<form hx-post="/items" hx-target={ fmt.Sprintf("#shop-items-%v", shopID) } hx-swap="beforeend" hx-on::after-request="this.reset()">
 			<div class="grid grid-cols-3 gap-1 p-2">
 				<input type="hidden" name="shopID" value={ shopID }/>
