@@ -22,9 +22,7 @@ import (
 )
 
 func run() error {
-	if err := godotenv.Load(); err != nil {
-		return err
-	}
+	_ = godotenv.Load()
 	db, err := sql.Open("sqlite3", cmp.Or(os.Getenv("DB"), ":memory:"))
 	if err != nil {
 		return err
@@ -33,8 +31,8 @@ func run() error {
 		slog.Warn("Migration error", "error", err)
 	}
 	s := app.NewServer(db)
-	slog.Info("Listening on http://localhost:8080")
-	return http.ListenAndServe("localhost:8080", s)
+	slog.Info("Listening on http://0.0.0.0:8080")
+	return http.ListenAndServe("0.0.0.0:8080", s)
 }
 
 func migrate(db *sql.DB) error {
