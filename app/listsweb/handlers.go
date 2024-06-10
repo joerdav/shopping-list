@@ -46,6 +46,12 @@ func RegisterHandlers(mux *http.ServeMux, config Config) {
 	)
 	routing.RegisterRoute(
 		mux,
+		"DELETE /lists/{listid}",
+		deleteListHandler(listCore),
+		authMiddleware,
+	)
+	routing.RegisterRoute(
+		mux,
 		"PUT /lists/{listid}/item",
 		setListItemCountHandler(listCore, itemsCore),
 		authMiddleware,
@@ -78,6 +84,29 @@ func listsListHandler(listCore *lists.Core) http.Handler {
 			// TODO: replace with error page
 			http.Error(w, "render error", http.StatusInternalServerError)
 		}
+	})
+}
+
+func deleteListHandler(listCore *lists.Core) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userID := auth.UserID(r.Context())
+		listID, err := uuid.Parse(r.PathValue("listid"))
+		if err != nil {
+			http.Error(w, "failed to parse id", http.StatusBadRequest)
+			return
+		}
+		list, err := listCore.Query(r.Context(), listID)
+		if err != nil || list.UserID != userID {
+			http.Error(w, "failed to get list", http.StatusInternalServerError)
+			return
+		}
+		err = listCore.Delete(r.Context(), listID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		// TODO: avoid a redirect
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 	})
 }
 

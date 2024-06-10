@@ -48,7 +48,7 @@ Env: DB=./db.db, SEED=1
 
 ```
 go run github.com/cosmtrek/air@v1.51.0 \
-    --build.cmd "go build -o tmp/bin/main" --build.bin "tmp/bin/main" --build.delay "100" \
+    --build.cmd "go build -tags dev -o tmp/bin/main" --build.bin "tmp/bin/main" --build.delay "100" \
     --build.include_ext "go" \
     --build.stop_on_error "false" \
     --misc.clean_on_exit true

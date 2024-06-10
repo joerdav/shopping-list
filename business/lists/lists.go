@@ -12,6 +12,7 @@ var ErrNotFound = errors.New("list not found")
 type Storer interface {
 	Create(context.Context, List) error
 	Update(context.Context, List) error
+	Delete(context.Context, uuid.UUID) error
 	Query(context.Context, uuid.UUID) (List, error)
 	QueryAll(context.Context, string) ([]List, error)
 }
@@ -61,4 +62,8 @@ func (c *Core) Query(ctx context.Context, id uuid.UUID) (List, error) {
 
 func (c *Core) QueryAll(ctx context.Context, userID string) ([]List, error) {
 	return c.storer.QueryAll(ctx, userID)
+}
+
+func (c *Core) Delete(ctx context.Context, listID uuid.UUID) error {
+	return c.storer.Delete(ctx, listID)
 }

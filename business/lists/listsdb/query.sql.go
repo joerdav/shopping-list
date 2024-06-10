@@ -42,6 +42,26 @@ func (q *Queries) DeleteItem(ctx context.Context, arg DeleteItemParams) error {
 	return err
 }
 
+const deleteItemsByList = `-- name: DeleteItemsByList :exec
+DELETE FROM list_items
+WHERE list_id = ?
+`
+
+func (q *Queries) DeleteItemsByList(ctx context.Context, listID uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deleteItemsByList, listID)
+	return err
+}
+
+const deleteList = `-- name: DeleteList :exec
+DELETE FROM lists
+WHERE id = ?
+`
+
+func (q *Queries) DeleteList(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deleteList, id)
+	return err
+}
+
 const deleteRecipe = `-- name: DeleteRecipe :exec
 DELETE FROM list_recipes
 where recipe_id = ? AND list_id = ?
@@ -54,6 +74,16 @@ type DeleteRecipeParams struct {
 
 func (q *Queries) DeleteRecipe(ctx context.Context, arg DeleteRecipeParams) error {
 	_, err := q.db.ExecContext(ctx, deleteRecipe, arg.RecipeID, arg.ListID)
+	return err
+}
+
+const deleteRecipesByList = `-- name: DeleteRecipesByList :exec
+DELETE FROM list_recipes
+WHERE list_id = ?
+`
+
+func (q *Queries) DeleteRecipesByList(ctx context.Context, listID uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deleteRecipesByList, listID)
 	return err
 }
 

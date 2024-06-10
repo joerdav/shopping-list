@@ -38,6 +38,25 @@ func (f *Storer) Create(ctx context.Context, list lists.List) error {
 	})
 }
 
+func (f *Storer) Delete(ctx context.Context, listID uuid.UUID) error {
+	tx, err := f.conn.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	qtx := f.store.WithTx(tx)
+	if err := qtx.DeleteItemsByList(ctx, listID); err != nil {
+		return err
+	}
+	if err := qtx.DeleteRecipesByList(ctx, listID); err != nil {
+		return err
+	}
+	if err := qtx.DeleteList(ctx, listID); err != nil {
+		return err
+	}
+	return tx.Commit()
+}
+
 func (f *Storer) Update(ctx context.Context, list lists.List) error {
 	recipes, err := f.store.GetRecipesByList(ctx, list.ID)
 	if err != nil {

@@ -114,9 +114,14 @@ templ ListsPage(path string, lists []ListSummary) {
 		<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
 			for _, l := range lists {
 				@common.Card(l.CreatedDate.Format("02 Jan 06 15:04")) {
-					<a class="bg-indigo-800 p-2 text-white rounded" href={ templ.SafeURL("/lists/" + l.ID) }>
-						View
-					</a>
+					<div class="flex gap-4">
+						<a class="bg-indigo-800 p-2 text-white rounded" href={ templ.SafeURL("/lists/" + l.ID) }>
+							View
+						</a>
+						<button type="submit" class="bg-red-600 p-2 text-white rounded" hx-delete={ "/lists/" + l.ID } hx-target="body" hx-swap="outerHTML">
+							Delete
+						</button>
+					</div>
 				}
 			}
 			@common.DottedCard() {
