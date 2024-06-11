@@ -36,7 +36,7 @@ func RegisterHandlers(mux *http.ServeMux, config Config) {
 
 	authMiddleware := middleware.AuthMiddleware(auth.NewCore())
 
-	routing.RegisterRoute(mux, "GET /{$}", listsListHandler(listCore), authMiddleware)
+	routing.RegisterRoute(mux, "GET /lists", listsListHandler(listCore), authMiddleware)
 	routing.RegisterRoute(mux, "POST /lists", createListHandler(listCore), authMiddleware)
 	routing.RegisterRoute(
 		mux,

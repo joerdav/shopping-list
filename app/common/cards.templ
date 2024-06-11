@@ -3,9 +3,9 @@ package common
 import "fmt"
 
 templ Card(title string) {
-	<div class="bg-white rounded shadow py-2 px-6">
+	<div class="bg-white rounded shadow p-6">
 		if title != "" {
-			<h2 class="text-gray-900 font-bold pb-2 border-b border-b-gray-200">{ title }</h2>
+			<h2 class="text-gray-900 font-bold pb-2 border-b border-b-gray-200 text-3xl">{ title }</h2>
 		}
 		<div class="py-2">
 			{ children... }

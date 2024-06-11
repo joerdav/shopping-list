@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/joerdav/shopping-list/app/authweb"
+	"github.com/joerdav/shopping-list/app/homeweb"
 	"github.com/joerdav/shopping-list/app/itemsweb"
 	"github.com/joerdav/shopping-list/app/listsweb"
 	"github.com/joerdav/shopping-list/app/recipesweb"
@@ -29,6 +30,7 @@ func (s *server) Routes() {
 	itemsweb.RegisterHandlers(s.mux, itemsweb.Config{Conn: s.conn})
 	recipesweb.RegisterHandlers(s.mux, recipesweb.Config{Conn: s.conn})
 	authweb.RegisterHandlers(s.mux, authweb.Config{Conn: s.conn})
+	homeweb.RegisterHandlers(s.mux, homeweb.Config{})
 
 	s.mux.Handle("/public/", public())
 }

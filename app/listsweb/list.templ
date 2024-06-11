@@ -80,6 +80,11 @@ templ ListItems(list List, availableItems []Item) {
 
 templ ListPage(path string, list List, availableRecipes []Recipe, availableItems []Item) {
 	@common.Layout(list.CreatedDate.Format("List - 02 Jan 06 15:04"), path) {
+		<div class="flex gap-4">
+			<button type="submit" class="bg-red-600 p-2 text-white rounded" hx-delete={ "/lists/" + list.ID } hx-target="body" hx-swap="outerHTML" hx-push-url="true">
+				Delete
+			</button>
+		</div>
 		<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
 			<div class="bg-white rounded shadow py-2 px-6">
 				<h2 class="text-gray-900 font-bold pb-2 border-b border-b-gray-200">Recipes</h2>
@@ -113,28 +118,17 @@ templ ListsPage(path string, lists []ListSummary) {
 	@common.Layout("Lists", path) {
 		<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
 			for _, l := range lists {
-				@common.Card(l.CreatedDate.Format("02 Jan 06 15:04")) {
-					<div class="flex gap-4">
-						<a class="bg-indigo-800 p-2 text-white rounded" href={ templ.SafeURL("/lists/" + l.ID) }>
-							View
-						</a>
-						<button type="submit" class="bg-red-600 p-2 text-white rounded" hx-delete={ "/lists/" + l.ID } hx-target="body" hx-swap="outerHTML">
-							Delete
-						</button>
-					</div>
-				}
+				<a href={ templ.SafeURL("/lists/" + l.ID) } class="bg-white shadow p-12 rounded text-gray-900 font-bold text-3xl">
+					{ l.CreatedDate.Format("02 Jan 06 15:04") }
+				</a>
 			}
-			@common.DottedCard() {
-				<form hx-post="/lists" hx-target="body" hx-swap="outerHTML">
-					<div class="grid grid-cols-3 gap-1 p-2">
-						<input
-							class="bg-indigo-800 p-2 rounded text-white"
-							type="submit"
-							value="New list"
-						/>
-					</div>
-				</form>
-			}
+			<button
+				class="bg-gray-600 p-12 rounded text-white text-5xl shadow"
+				value="New list"
+				hx-post="/lists"
+				hx-target="body"
+				hx-swap="outerHTML"
+			>+</button>
 		</div>
 	}
 }
