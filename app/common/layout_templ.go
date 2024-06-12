@@ -36,7 +36,7 @@ func Layout(title, path string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><link rel=\"stylesheet\" href=\"/public/styles.css\"><script src=\"https://unpkg.com/htmx.org@1.9.10\"></script><script src=\"https://cdn.jsdelivr.net/gh/gnat/surreal@main/surreal.js\"></script><script src=\"https://cdn.jsdelivr.net/gh/SortableJS/Sortable@master/Sortable.js\"></script></head><body class=\"flex flex-col h-screen\"><main class=\"flex-1\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><link rel=\"stylesheet\" href=\"/public/styles.css\"><script src=\"https://unpkg.com/htmx.org@1.9.10\"></script><script src=\"https://cdn.jsdelivr.net/gh/gnat/surreal@main/surreal.js\"></script><script src=\"https://cdn.jsdelivr.net/gh/SortableJS/Sortable@master/Sortable.js\"></script></head><body class=\"flex flex-col h-dvh\"><main class=\"flex-1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
