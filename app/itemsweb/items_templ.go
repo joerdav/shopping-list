@@ -53,7 +53,7 @@ func item(i Item) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"border border-gray-100 rounded shadow p-2 cursor-grab flex\"><div class=\"py-2 fill-gray-400\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"border border-gray-100 rounded-full shadow-lg p-3 text-3xl cursor-grab flex\"><div class=\"py-2 fill-gray-400\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -154,14 +154,14 @@ func Items(shopID string, items []Item) templ.Component {
 			templ_7745c5c3_Var7 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div><form hx-post=\"/items/swap\" hx-trigger=\"added\" class=\"grid grid-cols-3 gap-1 p-2\" id=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div><form hx-post=\"/items/swap\" hx-trigger=\"added\" class=\"grid grid-cols-3 gap-3\" id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("shop-items-%v", shopID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/itemsweb/items.templ`, Line: 34, Col: 125}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/itemsweb/items.templ`, Line: 34, Col: 121}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -188,7 +188,7 @@ func Items(shopID string, items []Item) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-swap=\"beforeend\" hx-on::after-request=\"this.reset()\"><div class=\"grid grid-cols-3 gap-1 p-2\"><input type=\"hidden\" name=\"shopID\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-swap=\"beforeend\" hx-on::after-request=\"this.reset()\"><div class=\"grid grid-cols-3 gap-3 text-3xl px-2 py-8\"><input type=\"hidden\" name=\"shopID\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -201,7 +201,7 @@ func Items(shopID string, items []Item) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"> <input class=\"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5\" placeholder=\"New item\" type=\"text\" name=\"itemName\" id=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"> <input class=\"col-span-2 bg-gray-50 border border-gray-300 text-gray-900 text-3xl rounded-full focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5\" placeholder=\"New item\" type=\"text\" name=\"itemName\" id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -214,7 +214,7 @@ func Items(shopID string, items []Item) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"> <input class=\"bg-indigo-800 p-2 rounded text-white\" type=\"submit\" value=\"Add\"></div></form></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"> <input type=\"submit\" value=\"Add\" class=\"inline-flex w-full justify-center rounded-full bg-black px-3 py-4 text-2xl font-semibold text-white shadow-sm hover:bg-red-500\"></div></form></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

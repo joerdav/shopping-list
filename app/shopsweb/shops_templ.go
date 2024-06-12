@@ -32,51 +32,38 @@ func ShopsPage(path string, shops []Shop) templ.Component {
 				templ_7745c5c3_Buffer = templ.GetBuffer()
 				defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"grid grid-cols-1 gap-4 lg:grid-cols-2\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<section class=\"grid grid-cols-1 gap-12 p-8 lg:grid-cols-2\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for _, s := range shops {
-				templ_7745c5c3_Var3 := templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
-					templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
-					if !templ_7745c5c3_IsBuffer {
-						templ_7745c5c3_Buffer = templ.GetBuffer()
-						defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
-					}
-					templ_7745c5c3_Err = itemsweb.Items(s.ID, s.Items).Render(ctx, templ_7745c5c3_Buffer)
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					if !templ_7745c5c3_IsBuffer {
-						_, templ_7745c5c3_Err = io.Copy(templ_7745c5c3_W, templ_7745c5c3_Buffer)
-					}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"rounded-3xl border border-gray-100 shadow-lg p-8\"><h2 class=\"font-semibold text-5xl text-black p-2 mb-8 border-b border-gray-300\">")
+				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
-				})
-				templ_7745c5c3_Err = common.Card(s.Name).Render(templ.WithChildren(ctx, templ_7745c5c3_Var3), templ_7745c5c3_Buffer)
+				}
+				var templ_7745c5c3_Var3 string
+				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(s.Name)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/shopsweb/shops.templ`, Line: 11, Col: 93}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h2>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = itemsweb.Items(s.ID, s.Items).Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Var4 := templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
-				templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
-				if !templ_7745c5c3_IsBuffer {
-					templ_7745c5c3_Buffer = templ.GetBuffer()
-					defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form hx-post=\"/shops\" hx-target=\"body\" hx-swap=\"outerHTML\" hx-on::after-request=\"this.reset()\"><div class=\"grid grid-cols-3 gap-1 p-2\"><input class=\"col-span-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5\" placeholder=\"New shop\" type=\"text\" name=\"shopName\"> <input class=\"bg-indigo-800 p-2 rounded text-white\" type=\"submit\" value=\"Add\"></div></form>")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				if !templ_7745c5c3_IsBuffer {
-					_, templ_7745c5c3_Err = io.Copy(templ_7745c5c3_W, templ_7745c5c3_Buffer)
-				}
-				return templ_7745c5c3_Err
-			})
-			templ_7745c5c3_Err = common.DottedCard().Render(templ.WithChildren(ctx, templ_7745c5c3_Var4), templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</section><div id=\"add-shop-modal\" class=\"relative z-10 group\" aria-labelledby=\"modal-title\" role=\"dialog\" aria-modal=\"true\"><!--\n    Background backdrop, show/hide based on modal state.\n\n    Entering: \"ease-out duration-300\"\n      From: \"opacity-0\"\n      To: \"opacity-100\"\n    Leaving: \"ease-in duration-200\"\n      From: \"opacity-100\"\n      To: \"opacity-0\"\n  --><div class=\"fixed inset-0 bg-gray-500 bg-opacity-0 transition-opacity hidden group-[.active]:block group-[.active]:bg-opacity-75\"></div><div class=\"fixed inset-0 z-10 w-screen overflow-y-auto hidden group-[.active]:block\"><div class=\"flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0\"><!--\n        Modal panel, show/hide based on modal state.\n\n        Entering: \"ease-out duration-300\"\n          From: \"opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95\"\n          To: \"opacity-100 translate-y-0 sm:scale-100\"\n        Leaving: \"ease-in duration-200\"\n          From: \"opacity-100 translate-y-0 sm:scale-100\"\n          To: \"opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95\"\n      --><form hx-post=\"/shops\" hx-target=\"body\" hx-swap=\"outerHTML\" hx-on::after-request=\"this.reset()\" class=\"relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all\"><div class=\"bg-white px-8 pb-8 pt-5\"><div class=\"mt-3 text-center\"><h3 class=\"text-5xl font-semibold text-gray-900 pb-8\" id=\"modal-title\">Add shop</h3><input class=\"col-span-2 bg-gray-50 border border-gray-300 text-gray-900 text-3xl rounded-full focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5\" placeholder=\"New shop\" type=\"text\" name=\"shopName\" id=\"add-shop-input\"></div></div><div class=\"bg-gray-50 px-8 pb-8 flex gap-4\"><input type=\"submit\" value=\"Add\" class=\"inline-flex w-full justify-center rounded-full bg-black px-3 py-4 text-2xl font-semibold text-white shadow-sm hover:bg-red-500\"> <button type=\"button\" class=\"inline-flex w-full justify-center rounded-full bg-white px-3 py-4 text-2xl font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50\">Cancel</button><script>\n\t\t\t\t\t\t\t\t(function(){\n\t\t\t\t\t\t\t\t\tconst modal = me(\"#add-shop-modal\")\n\t\t\t\t\t\t\t\t\tme(\"-\").on(\"click\", evt => {halt(); modal.classToggle(\"active\")})\n\t\t\t\t\t\t\t\t})()\n\t\t\t\t\t\t\t</script></div></form></div></div></div><button class=\"fixed bottom-48 right-8 border border-gray-300 rounded-full shadow-lg p-8 text-4xl text-gray-500 font-light\">+ New shop</button><script>\n\t\t\t(function(){\n\t\t\t\tconst modal = me(\"#add-shop-modal\")\n\t\t\t\tconst inp = me(\"#add-shop-input\")\n\t\t\t\tme(\"-\").on(\"click\", evt => {\n\t\t\t\t\tmodal.classToggle(\"active\")\n\t\t\t\t\tinp.focus()\n\t\t\t\t})\n\t\t\t})()\n\t\t</script>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

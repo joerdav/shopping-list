@@ -11,7 +11,7 @@ templ draggable() {
 }
 
 templ item(i Item) {
-	<div class="border border-gray-100 rounded shadow p-2 cursor-grab flex">
+	<div class="border border-gray-100 rounded-full shadow-lg p-3 text-3xl cursor-grab flex">
 		<div class="py-2 fill-gray-400">
 			@draggable()
 		</div>
@@ -31,7 +31,7 @@ templ itemList(shopID string, items []Item) {
 
 templ Items(shopID string, items []Item) {
 	<div>
-		<form hx-post="/items/swap" hx-trigger="added" class="grid grid-cols-3 gap-1 p-2" id={ fmt.Sprintf("shop-items-%v", shopID) }>
+		<form hx-post="/items/swap" hx-trigger="added" class="grid grid-cols-3 gap-3" id={ fmt.Sprintf("shop-items-%v", shopID) }>
 			@itemList(shopID, items)
 		</form>
 		<script>
@@ -64,20 +64,16 @@ templ Items(shopID string, items []Item) {
 			})();
 		</script>
 		<form hx-post="/items" hx-target={ fmt.Sprintf("#shop-items-%v", shopID) } hx-swap="beforeend" hx-on::after-request="this.reset()">
-			<div class="grid grid-cols-3 gap-1 p-2">
+			<div class="grid grid-cols-3 gap-3 text-3xl px-2 py-8">
 				<input type="hidden" name="shopID" value={ shopID }/>
 				<input
-					class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+					class="col-span-2 bg-gray-50 border border-gray-300 text-gray-900 text-3xl rounded-full focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
 					placeholder="New item"
 					type="text"
 					name="itemName"
 					id={ fmt.Sprintf("shop-item-add-%v", shopID) }
 				/>
-				<input
-					class="bg-indigo-800 p-2 rounded text-white"
-					type="submit"
-					value="Add"
-				/>
+				<input type="submit" value="Add" class="inline-flex w-full justify-center rounded-full bg-black px-3 py-4 text-2xl font-semibold text-white shadow-sm hover:bg-red-500"/>
 			</div>
 		</form>
 	</div>
