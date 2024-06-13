@@ -2,6 +2,7 @@ package listsweb
 
 import "fmt"
 import "github.com/joerdav/shopping-list/app/common"
+import "path"
 
 func recipeInList(recipeID string, list List) bool {
 	for _, r := range list.Recipes {
@@ -80,8 +81,18 @@ templ ListItems(list List, availableItems []Item) {
 	</div>
 }
 
-templ ListPage(path string, list List, availableRecipes []Recipe, availableItems []Item) {
-	@common.Layout(list.CreatedDate.Format("List - 02 Jan 06 15:04"), path) {
+templ ItemButton(listID string, i ListItem) {
+	<button
+		class={ "border border-gray-300 rounded-full shadow px-4 py-1", templ.KV("line-through bg-gray-200 text-gray-500", i.Bought) }
+		hx-post={ path.Join("/lists", listID, "item", i.ID, "toggle") }
+		hx-swap="outerHTML"
+		hx-target="#list"
+		hx-select="#list"
+	>{ i.Name } x { fmt.Sprint(i.Quantity) }</button>
+}
+
+templ ListPage(urlpath string, list List, availableRecipes []Recipe, availableItems []Item) {
+	@common.Layout(list.CreatedDate.Format("List - 02 Jan 06 15:04"), urlpath) {
 		<section id="list" class="grid grid-cols-1 gap-4 px-4 pt-4 pb-28 sm:grid-cols-3">
 			<h2 class="text-xl border-b border-gray-300 col-span-full font-bold px-4">List</h2>
 			<div class="rounded-xl border border-gray-100 shadow-lg py-4 px-2">
@@ -103,7 +114,7 @@ templ ListPage(path string, list List, availableRecipes []Recipe, availableItems
 					<div class="py-4 px-2">
 						<div class="flex flex-wrap gap-1">
 							for _, i := range shop.Items {
-								<div class="border border-gray-300 rounded-full shadow px-4 py-1">{ i.Name } x { fmt.Sprint(i.Quantity) }</div>
+								@ItemButton(list.ID, i)
 							}
 						</div>
 					</div>
@@ -130,7 +141,7 @@ templ ListsPage(path string, lists []ListSummary) {
 		<button
 			value="+ New list"
 			hx-post="/lists"
-			hx-target="#list"
+			hx-target="body"
 			hx-swap="outerHTML"
 			class="absolute bg-white bottom-24 right-4 border border-gray-300 rounded-full shadow-lg py-2 px-3 text-gray-500"
 		>+ New list</button>

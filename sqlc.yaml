@@ -1,53 +1,28 @@
 version: "2"
 sql:
   - engine: "sqlite"
-    queries: "./business/users/usersdb/query.sql"
-    schema: "./business/users/usersdb/schema.sql"
+    queries: "./queries/"
+    schema: "./migrations"
     gen:
       go:
-        out: "./business/users/usersdb"
-  - engine: "sqlite"
-    queries: "./business/shops/shopsdb/query.sql"
-    schema: "./business/shops/shopsdb/schema.sql"
-    gen:
-      go:
-        out: "./business/shops/shopsdb"
+        out: "./db"
         overrides:
           - column: "shops.id"
             go_type: "github.com/google/uuid.UUID"
-  - engine: "sqlite"
-    queries: "./business/items/itemsdb/query.sql"
-    schema: "./business/items/itemsdb/schema.sql"
-    gen:
-      go:
-        out: "./business/items/itemsdb"
-        overrides:
           - column: "items.id"
             go_type: "github.com/google/uuid.UUID"
           - column: "items.shop_id"
             go_type: "github.com/google/uuid.UUID"
-  - engine: "sqlite"
-    queries: "./business/recipes/recipesdb/query.sql"
-    schema: "./business/recipes/recipesdb/schema.sql"
-    gen:
-      go:
-        out: "./business/recipes/recipesdb"
-        overrides:
           - column: "recipes.id"
             go_type: "github.com/google/uuid.UUID"
           - column: "ingredients.item_id"
             go_type: "github.com/google/uuid.UUID"
           - column: "ingredients.recipe_id"
             go_type: "github.com/google/uuid.UUID"
-  - engine: "sqlite"
-    queries: "./business/lists/listsdb/query.sql"
-    schema: "./business/lists/listsdb/schema.sql"
-    gen:
-      go:
-        out: "./business/lists/listsdb"
-        overrides:
           - column: "lists.id"
             go_type: "github.com/google/uuid.UUID"
+          - column: "lists.bought"
+            go_type: "string"
           - column: "list_items.list_id"
             go_type: "github.com/google/uuid.UUID"
           - column: "list_items.item_id"

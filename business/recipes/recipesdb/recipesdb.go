@@ -7,30 +7,23 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/joerdav/shopping-list/business/recipes"
+	"github.com/joerdav/shopping-list/db"
 )
 
-//go:embed schema.sql
-var schema string
-
 type Storer struct {
-	store *Queries
+	store *db.Queries
 	conn  *sql.DB
 }
 
 func NewStorer(conn *sql.DB) *Storer {
 	return &Storer{
-		store: New(conn),
+		store: db.New(conn),
 		conn:  conn,
 	}
 }
 
-func (f *Storer) Migrate(ctx context.Context) error {
-	_, err := f.conn.ExecContext(ctx, schema)
-	return err
-}
-
 func (f *Storer) Create(ctx context.Context, recipe recipes.Recipe) error {
-	return f.store.CreateRecipe(ctx, CreateRecipeParams{
+	return f.store.CreateRecipe(ctx, db.CreateRecipeParams{
 		ID:     recipe.ID,
 		UserID: recipe.UserID,
 		Name:   recipe.Name,
@@ -49,7 +42,7 @@ func (f *Storer) Update(ctx context.Context, recipe recipes.Recipe) error {
 	defer tx.Rollback()
 	qtx := f.store.WithTx(tx)
 	for id, qty := range recipe.Ingredients {
-		if err := qtx.SetIngredient(ctx, SetIngredientParams{
+		if err := qtx.SetIngredient(ctx, db.SetIngredientParams{
 			ItemID:   id,
 			RecipeID: recipe.ID,
 			Quantity: int64(qty),
@@ -59,7 +52,7 @@ func (f *Storer) Update(ctx context.Context, recipe recipes.Recipe) error {
 	}
 	for _, i := range ingredients {
 		if _, ok := recipe.Ingredients[i.ItemID]; !ok {
-			if err := qtx.DeleteIngredient(ctx, DeleteIngredientParams{
+			if err := qtx.DeleteIngredient(ctx, db.DeleteIngredientParams{
 				ItemID:   i.ItemID,
 				RecipeID: recipe.ID,
 			}); err != nil {
@@ -100,7 +93,7 @@ func (f *Storer) QueryAll(ctx context.Context, userID string) ([]recipes.Recipe,
 	return out, nil
 }
 
-func toCoreRecipe(r Recipe, is []Ingredient) recipes.Recipe {
+func toCoreRecipe(r db.Recipe, is []db.Ingredient) recipes.Recipe {
 	return recipes.Recipe{
 		ID:          r.ID,
 		UserID:      r.UserID,
@@ -109,7 +102,7 @@ func toCoreRecipe(r Recipe, is []Ingredient) recipes.Recipe {
 	}
 }
 
-func toCoreIngredients(ingredients []Ingredient) map[uuid.UUID]int {
+func toCoreIngredients(ingredients []db.Ingredient) map[uuid.UUID]int {
 	out := map[uuid.UUID]int{}
 	for _, i := range ingredients {
 		out[i.ItemID] = int(i.Quantity)

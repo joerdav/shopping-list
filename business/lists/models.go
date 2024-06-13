@@ -17,11 +17,13 @@ type List struct {
 	CreatedDate time.Time
 	Recipes     map[uuid.UUID]int
 	Items       map[uuid.UUID]int
+	BoughtItems map[uuid.UUID]bool
 }
 
 type UpdateList struct {
-	ID      uuid.UUID
-	UserID  string
-	Recipes *map[uuid.UUID]int
-	Items   *map[uuid.UUID]int
+	ID          uuid.UUID
+	UserID      string
+	Recipes     *map[uuid.UUID]int
+	Items       *map[uuid.UUID]int
+	BoughtItems *map[uuid.UUID]bool
 }

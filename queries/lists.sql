@@ -2,6 +2,12 @@
 INSERT INTO lists (id, created_date, user_id)
 VALUES (?, ?, ?);
 
+-- name: UpdateList :one
+UPDATE lists
+set bought = ?
+WHERE id = ?
+RETURNING *;
+
 -- name: GetList :one
 SELECT * FROM lists
 WHERE id = ?

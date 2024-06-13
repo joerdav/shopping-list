@@ -3,30 +3,22 @@ package usersdb
 import (
 	"context"
 	"database/sql"
-	_ "embed"
 	"errors"
 
 	"github.com/joerdav/shopping-list/business/users"
+	"github.com/joerdav/shopping-list/db"
 )
 
-//go:embed schema.sql
-var schema string
-
 type Storer struct {
-	store *Queries
+	store *db.Queries
 	conn  *sql.DB
 }
 
 func NewStorer(conn *sql.DB) *Storer {
 	return &Storer{
-		store: New(conn),
+		store: db.New(conn),
 		conn:  conn,
 	}
-}
-
-func (f *Storer) Migrate(ctx context.Context) error {
-	_, err := f.conn.ExecContext(ctx, schema)
-	return err
 }
 
 func (f *Storer) Create(ctx context.Context, user users.User) error {
@@ -41,10 +33,10 @@ func (f *Storer) Query(ctx context.Context, id string) (users.User, error) {
 	if err != nil {
 		return users.User{}, err
 	}
-	return toCoreUser(User{user}), nil
+	return toCoreUser(db.User{user}), nil
 }
 
-func toCoreUser(s User) users.User {
+func toCoreUser(s db.User) users.User {
 	return users.User{
 		ID: s.ID,
 	}

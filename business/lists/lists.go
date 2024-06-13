@@ -30,6 +30,9 @@ func (c *Core) Update(ctx context.Context, s UpdateList) (List, error) {
 	if err != nil {
 		return List{}, err
 	}
+	if s.BoughtItems != nil {
+		list.BoughtItems = *s.BoughtItems
+	}
 	if s.Recipes != nil {
 		list.Recipes = *s.Recipes
 	}
@@ -49,6 +52,7 @@ func (c *Core) Create(ctx context.Context, s NewList) (List, error) {
 		CreatedDate: s.CreatedDate,
 		Recipes:     map[uuid.UUID]int{},
 		Items:       map[uuid.UUID]int{},
+		BoughtItems: map[uuid.UUID]bool{},
 	}
 	if err := c.storer.Create(ctx, list); err != nil {
 		return List{}, err

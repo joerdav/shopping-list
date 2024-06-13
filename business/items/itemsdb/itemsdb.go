@@ -3,34 +3,26 @@ package itemsdb
 import (
 	"context"
 	"database/sql"
-	_ "embed"
 
 	"github.com/google/uuid"
 	"github.com/joerdav/shopping-list/business/items"
+	"github.com/joerdav/shopping-list/db"
 )
 
-//go:embed schema.sql
-var schema string
-
 type Storer struct {
-	store *Queries
+	store *db.Queries
 	conn  *sql.DB
 }
 
 func NewStorer(conn *sql.DB) *Storer {
 	return &Storer{
-		store: New(conn),
+		store: db.New(conn),
 		conn:  conn,
 	}
 }
 
-func (f *Storer) Migrate(ctx context.Context) error {
-	_, err := f.conn.ExecContext(ctx, schema)
-	return err
-}
-
 func (f *Storer) Create(ctx context.Context, item items.Item) error {
-	return f.store.CreateItem(ctx, CreateItemParams{
+	return f.store.CreateItem(ctx, db.CreateItemParams{
 		ID:     item.ID,
 		Name:   item.Name,
 		UserID: item.UserID,
@@ -71,7 +63,7 @@ func (f *Storer) QueryAll(ctx context.Context, userID string) ([]items.Item, err
 }
 
 func (f *Storer) Update(ctx context.Context, p items.Item) (items.Item, error) {
-	item, err := f.store.UpdateItem(ctx, UpdateItemParams{
+	item, err := f.store.UpdateItem(ctx, db.UpdateItemParams{
 		Name:   p.Name,
 		ShopID: p.ShopID,
 		ID:     p.ID,
@@ -82,7 +74,7 @@ func (f *Storer) Update(ctx context.Context, p items.Item) (items.Item, error) {
 	return toCoreItem(item), nil
 }
 
-func toCoreItem(s Item) items.Item {
+func toCoreItem(s db.Item) items.Item {
 	return items.Item{
 		ID:     s.ID,
 		Name:   s.Name,

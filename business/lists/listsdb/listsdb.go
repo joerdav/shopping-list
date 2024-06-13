@@ -3,35 +3,29 @@ package listsdb
 import (
 	"context"
 	"database/sql"
-	_ "embed"
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/joerdav/shopping-list/business/lists"
+	"github.com/joerdav/shopping-list/db"
 )
 
-//go:embed schema.sql
-var schema string
-
 type Storer struct {
-	store *Queries
+	store *db.Queries
 	conn  *sql.DB
 }
 
 func NewStorer(conn *sql.DB) *Storer {
 	return &Storer{
-		store: New(conn),
+		store: db.New(conn),
 		conn:  conn,
 	}
 }
 
-func (f *Storer) Migrate(ctx context.Context) error {
-	_, err := f.conn.ExecContext(ctx, schema)
-	return err
-}
-
 func (f *Storer) Create(ctx context.Context, list lists.List) error {
-	return f.store.CreateList(ctx, CreateListParams{
+	return f.store.CreateList(ctx, db.CreateListParams{
 		ID:          list.ID,
 		UserID:      list.UserID,
 		CreatedDate: list.CreatedDate.Unix(),
@@ -74,7 +68,7 @@ func (f *Storer) Update(ctx context.Context, list lists.List) error {
 	qtx := f.store.WithTx(tx)
 	// Update recipes
 	for recipeID, quantity := range list.Recipes {
-		if err := qtx.SetRecipe(ctx, SetRecipeParams{
+		if err := qtx.SetRecipe(ctx, db.SetRecipeParams{
 			ListID:   list.ID,
 			RecipeID: recipeID,
 			Quantity: int64(quantity),
@@ -85,7 +79,7 @@ func (f *Storer) Update(ctx context.Context, list lists.List) error {
 	// Delete recipes
 	for _, recipes := range recipes {
 		if _, ok := list.Recipes[recipes.RecipeID]; !ok {
-			if err := qtx.DeleteRecipe(ctx, DeleteRecipeParams{
+			if err := qtx.DeleteRecipe(ctx, db.DeleteRecipeParams{
 				ListID:   list.ID,
 				RecipeID: recipes.RecipeID,
 			}); err != nil {
@@ -95,7 +89,7 @@ func (f *Storer) Update(ctx context.Context, list lists.List) error {
 	}
 	// Update items
 	for itemID, quantity := range list.Items {
-		if err := qtx.SetItem(ctx, SetItemParams{
+		if err := qtx.SetItem(ctx, db.SetItemParams{
 			ListID:   list.ID,
 			ItemID:   itemID,
 			Quantity: int64(quantity),
@@ -106,13 +100,28 @@ func (f *Storer) Update(ctx context.Context, list lists.List) error {
 	// Delete items
 	for _, item := range items {
 		if _, ok := list.Items[item.ItemID]; !ok {
-			if err := qtx.DeleteItem(ctx, DeleteItemParams{
+			if err := qtx.DeleteItem(ctx, db.DeleteItemParams{
 				ListID: list.ID,
 				ItemID: item.ItemID,
 			}); err != nil {
 				return err
 			}
 		}
+	}
+
+	var bought []string
+	fmt.Println(list.BoughtItems)
+	for b, i := range list.BoughtItems {
+		if i {
+			bought = append(bought, b.String())
+		}
+	}
+
+	if _, err := qtx.UpdateList(ctx, db.UpdateListParams{
+		Bought: strings.Join(bought, ","),
+		ID:     list.ID,
+	}); err != nil {
+		return err
 	}
 
 	return tx.Commit()
@@ -154,19 +163,25 @@ func (f *Storer) QueryAll(ctx context.Context, userID string) ([]lists.List, err
 	return coreLists, nil
 }
 
-func toCoreList(list List, items []ListItem, recipes []ListRecipe) lists.List {
+func toCoreList(list db.List, items []db.ListItem, recipes []db.ListRecipe) lists.List {
 	coreList := lists.List{
 		ID:          list.ID,
 		UserID:      list.UserID,
 		CreatedDate: time.Unix(list.CreatedDate, 0),
 		Items:       make(map[uuid.UUID]int),
 		Recipes:     make(map[uuid.UUID]int),
+		BoughtItems: make(map[uuid.UUID]bool),
 	}
 	for _, item := range items {
 		coreList.Items[item.ItemID] = int(item.Quantity)
 	}
 	for _, recipe := range recipes {
 		coreList.Recipes[recipe.RecipeID] = int(recipe.Quantity)
+	}
+	if len(list.Bought) > 0 {
+		for _, b := range strings.Split(list.Bought, ",") {
+			coreList.BoughtItems[uuid.MustParse(b)] = true
+		}
 	}
 	return coreList
 }

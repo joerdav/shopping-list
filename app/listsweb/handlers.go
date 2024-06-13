@@ -62,6 +62,12 @@ func RegisterHandlers(mux *http.ServeMux, config Config) {
 		setListRecipeCountHandler(listCore, recipeCore),
 		authMiddleware,
 	)
+	routing.RegisterRoute(
+		mux,
+		"POST /lists/{listid}/item/{itemid}/toggle",
+		toggleItemBoughtHandler(listCore, itemsCore),
+		authMiddleware,
+	)
 }
 
 func listsListHandler(listCore *lists.Core) http.Handler {
@@ -172,6 +178,7 @@ func getListHandler(
 				Name:     ci.Name,
 				Quantity: count,
 				ShopID:   ci.ShopID.String(),
+				Bought:   list.BoughtItems[id],
 			}
 			items[sid] = item
 			selectedItems[sid] = item
@@ -203,6 +210,7 @@ func getListHandler(
 						Name:     ci.Name,
 						Quantity: count,
 						ShopID:   ci.ShopID.String(),
+						Bought:   list.BoughtItems[id],
 					}
 					continue
 				}
@@ -277,6 +285,59 @@ func getListHandler(
 			// TODO: replace with error page
 			http.Error(w, "render error", http.StatusInternalServerError)
 		}
+	})
+}
+
+func toggleItemBoughtHandler(listCore *lists.Core, itemCore *items.Core) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userID := auth.UserID(r.Context())
+		listID, err := uuid.Parse(r.PathValue("listid"))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		itemID, err := uuid.Parse(r.PathValue("itemid"))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		list, err := listCore.Query(r.Context(), listID)
+		if errors.Is(err, lists.ErrNotFound) {
+			http.Error(w, "list not found", http.StatusNotFound)
+			return
+		}
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if list.UserID != userID {
+			http.Error(w, "list not found", http.StatusNotFound)
+			return
+		}
+		item, err := itemCore.Query(r.Context(), itemID)
+		if errors.Is(err, items.ErrNotFound) {
+			http.Error(w, "item not found", http.StatusNotFound)
+			return
+		}
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if item.UserID != userID {
+			http.Error(w, "item not found", http.StatusNotFound)
+			return
+		}
+		list.BoughtItems[itemID] = !list.BoughtItems[itemID]
+		_, err = listCore.Update(r.Context(), lists.UpdateList{
+			ID:          listID,
+			UserID:      userID,
+			BoughtItems: &list.BoughtItems,
+		})
+		if err != nil {
+			http.Error(w, "failed to update list", http.StatusInternalServerError)
+			return
+		}
+		http.Redirect(w, r, fmt.Sprintf("/lists/%s", listID), http.StatusSeeOther)
 	})
 }
 
@@ -418,6 +479,7 @@ type ListItem struct {
 	ShopID   string
 	Name     string
 	Quantity int
+	Bought   bool
 }
 
 type ListRecipe struct {

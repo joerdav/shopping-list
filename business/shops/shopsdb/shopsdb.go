@@ -3,34 +3,26 @@ package shopsdb
 import (
 	"context"
 	"database/sql"
-	_ "embed"
 
 	"github.com/google/uuid"
 	"github.com/joerdav/shopping-list/business/shops"
+	"github.com/joerdav/shopping-list/db"
 )
 
-//go:embed schema.sql
-var schema string
-
 type Storer struct {
-	store *Queries
+	store *db.Queries
 	conn  *sql.DB
 }
 
 func NewStorer(conn *sql.DB) *Storer {
 	return &Storer{
-		store: New(conn),
+		store: db.New(conn),
 		conn:  conn,
 	}
 }
 
-func (f *Storer) Migrate(ctx context.Context) error {
-	_, err := f.conn.ExecContext(ctx, schema)
-	return err
-}
-
 func (f *Storer) Create(ctx context.Context, shop shops.Shop) error {
-	return f.store.CreateShop(ctx, CreateShopParams{
+	return f.store.CreateShop(ctx, db.CreateShopParams{
 		ID:     shop.ID,
 		UserID: shop.UserID,
 		Name:   shop.Name,
@@ -57,7 +49,7 @@ func (f *Storer) QueryAll(ctx context.Context, userID string) ([]shops.Shop, err
 	return shops, nil
 }
 
-func toCoreShop(s Shop) shops.Shop {
+func toCoreShop(s db.Shop) shops.Shop {
 	return shops.Shop{
 		ID:     s.ID,
 		UserID: s.UserID,
