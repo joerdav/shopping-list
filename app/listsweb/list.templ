@@ -121,7 +121,7 @@ templ ListPage(urlpath string, list List, availableRecipes []Recipe, availableIt
 				</div>
 			}
 			<div class="flex p-8 col-span-full">
-				<button type="submit" class="bg-red-600 py-2 px-4 text-white text-lg rounded-full shadow-lg mx-auto" hx-delete={ "/lists/" + list.ID } hx-target="#list" hx-swap="outerHTML" hx-push-url="true">
+				<button type="submit" class="bg-red-600 py-2 px-4 text-white text-lg rounded-full shadow-lg mx-auto" hx-delete={ "/lists/" + list.ID } hx-target="body" hx-swap="outerHTML" hx-push-url="true">
 					Delete list
 				</button>
 			</div>
@@ -142,6 +142,7 @@ templ ListsPage(path string, lists []ListSummary) {
 			value="+ New list"
 			hx-post="/lists"
 			hx-target="body"
+			hx-push-url="true"
 			hx-swap="outerHTML"
 			class="absolute bg-white bottom-24 right-4 border border-gray-300 rounded-full shadow-lg py-2 px-3 text-gray-500"
 		>+ New list</button>

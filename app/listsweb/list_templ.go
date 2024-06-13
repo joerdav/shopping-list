@@ -401,7 +401,7 @@ func ListPage(urlpath string, list List, availableRecipes []Recipe, availableIte
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-target=\"#list\" hx-swap=\"outerHTML\" hx-push-url=\"true\">Delete list</button></div></section>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-target=\"body\" hx-swap=\"outerHTML\" hx-push-url=\"true\">Delete list</button></div></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -472,7 +472,7 @@ func ListsPage(path string, lists []ListSummary) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</section><button value=\"+ New list\" hx-post=\"/lists\" hx-target=\"body\" hx-swap=\"outerHTML\" class=\"absolute bg-white bottom-24 right-4 border border-gray-300 rounded-full shadow-lg py-2 px-3 text-gray-500\">+ New list</button>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</section><button value=\"+ New list\" hx-post=\"/lists\" hx-target=\"body\" hx-push-url=\"true\" hx-swap=\"outerHTML\" class=\"absolute bg-white bottom-24 right-4 border border-gray-300 rounded-full shadow-lg py-2 px-3 text-gray-500\">+ New list</button>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
