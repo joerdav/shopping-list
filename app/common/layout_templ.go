@@ -76,12 +76,12 @@ func nav(path string) templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<nav class=\"bg-white border-t border-r px-8 py-2 flex justify-between items-center sm:flex-col sm:px-4 sm:justify-start sm:gap-4\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<nav class=\"bg-black border-t border-r px-8 py-2 flex justify-between items-center sm:flex-col sm:px-4 sm:justify-start sm:gap-4\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, l := range links {
-			var templ_7745c5c3_Var4 = []any{"flex flex-col items-center text-gray-500 group", templ.KV("active", path == l.Url)}
+			var templ_7745c5c3_Var4 = []any{"flex flex-col items-center text-white group", templ.KV("active", path == l.Url)}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var4...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -112,11 +112,11 @@ func nav(path string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = l.Icon("w-6 h-6 stroke-2 group-[.active]:text-gray-900").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = l.Icon("w-6 h-6 stroke-2").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<span class=\"text-sm font-medium group-[.active]:text-gray-900\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<span class=\"text-sm font-medium underline-offset-4 group-[.active]:underline\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

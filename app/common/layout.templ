@@ -20,14 +20,14 @@ templ Layout(title, path string) {
 }
 
 templ nav(path string) {
-	<nav class="bg-white border-t border-r px-8 py-2 flex justify-between items-center sm:flex-col sm:px-4 sm:justify-start sm:gap-4">
+	<nav class="bg-black border-t border-r px-8 py-2 flex justify-between items-center sm:flex-col sm:px-4 sm:justify-start sm:gap-4">
 		for _, l := range links {
 			<a
 				href={ templ.SafeURL(l.Url) }
-				class={ "flex flex-col items-center text-gray-500 group", templ.KV("active", path == l.Url) }
+				class={ "flex flex-col items-center text-white group", templ.KV("active", path == l.Url) }
 			>
-				@l.Icon("w-6 h-6 stroke-2 group-[.active]:text-gray-900")
-				<span class="text-sm font-medium group-[.active]:text-gray-900">
+				@l.Icon("w-6 h-6 stroke-2")
+				<span class="text-sm font-medium underline-offset-4 group-[.active]:underline">
 					{ l.Title }
 				</span>
 			</a>
