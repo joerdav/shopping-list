@@ -5,44 +5,27 @@ import "github.com/joerdav/shopping-list/app/itemsweb"
 
 templ ShopsPage(path string, shops []Shop) {
 	@common.Layout("Shops", path) {
-		<section class="grid grid-cols-1 gap-12 p-8 lg:grid-cols-2">
+		<section class="grid grid-cols-1 gap-4 px-4 pt-4 pb-28 sm:grid-cols-3">
 			for _, s := range shops {
-				<div class="rounded-3xl border border-gray-100 shadow-lg p-8">
-					<h2 class="font-semibold text-5xl text-black p-2 mb-8 border-b border-gray-300">{ s.Name }</h2>
+				<div class="rounded-xl border border-gray-100 shadow-lg px-2">
+					<h2 class="font-semibold text-lg text-black p-2 mb-2 border-b border-gray-300">{ s.Name }</h2>
 					@itemsweb.Items(s.ID, s.Items)
 				</div>
 			}
+			<p class="col-span-full px-2 text-sm text-gray-400">
+				Hint: You can drag and drop items between shops.
+			</p>
 		</section>
 		<div id="add-shop-modal" class="relative z-10 group" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-			<!--
-    Background backdrop, show/hide based on modal state.
-
-    Entering: "ease-out duration-300"
-      From: "opacity-0"
-      To: "opacity-100"
-    Leaving: "ease-in duration-200"
-      From: "opacity-100"
-      To: "opacity-0"
-  -->
 			<div class="fixed inset-0 bg-gray-500 bg-opacity-0 transition-opacity hidden group-[.active]:block group-[.active]:bg-opacity-75"></div>
 			<div class="fixed inset-0 z-10 w-screen overflow-y-auto hidden group-[.active]:block">
-				<div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-					<!--
-        Modal panel, show/hide based on modal state.
-
-        Entering: "ease-out duration-300"
-          From: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-          To: "opacity-100 translate-y-0 sm:scale-100"
-        Leaving: "ease-in duration-200"
-          From: "opacity-100 translate-y-0 sm:scale-100"
-          To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-      -->
-					<form hx-post="/shops" hx-target="body" hx-swap="outerHTML" hx-on::after-request="this.reset()" class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all">
+				<div class="flex min-h-full items-end justify-center p-4 text-center">
+					<form hx-post="/shops" hx-target="body" hx-swap="outerHTML" hx-on::after-request="this.reset()" class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-lg transition-all">
 						<div class="bg-white px-8 pb-8 pt-5">
 							<div class="mt-3 text-center">
-								<h3 class="text-5xl font-semibold text-gray-900 pb-8" id="modal-title">Add shop</h3>
+								<h3 class="text-lg font-semibold text-gray-900 pb-2" id="modal-title">Add shop</h3>
 								<input
-									class="col-span-2 bg-gray-50 border border-gray-300 text-gray-900 text-3xl rounded-full focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+									class="col-span-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-full focus:ring-blue-500 focus:border-blue-500 block w-full py-2.5 px-1"
 									placeholder="New shop"
 									type="text"
 									name="shopName"
@@ -50,9 +33,9 @@ templ ShopsPage(path string, shops []Shop) {
 								/>
 							</div>
 						</div>
-						<div class="bg-gray-50 px-8 pb-8 flex gap-4">
-							<input type="submit" value="Add" class="inline-flex w-full justify-center rounded-full bg-black px-3 py-4 text-2xl font-semibold text-white shadow-sm hover:bg-red-500"/>
-							<button type="button" class="inline-flex w-full justify-center rounded-full bg-white px-3 py-4 text-2xl font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">Cancel</button>
+						<div class="bg-gray-50 px-2 pb-2 flex gap-1">
+							<input type="submit" value="Add" class="inline-flex w-full justify-center rounded-full bg-black px-1 py-2 font-semibold text-white shadow-sm hover:bg-red-500"/>
+							<button type="button" class="inline-flex w-full justify-center rounded-full bg-white px-1 py-2 font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">Cancel</button>
 							<script>
 								(function(){
 									const modal = me("#add-shop-modal")
@@ -65,7 +48,7 @@ templ ShopsPage(path string, shops []Shop) {
 			</div>
 		</div>
 		<button
-			class="fixed bottom-48 right-8 border border-gray-300 rounded-full shadow-lg p-8 text-4xl text-gray-500 font-light"
+			class="absolute bg-white bottom-24 right-4 border border-gray-300 rounded-full shadow-lg py-2 px-3 text-gray-500"
 		>+ New shop</button>
 		<script>
 			(function(){

@@ -5,12 +5,13 @@ templ Layout(title, path string) {
 		<head>
 			<title>Shopping List - { title }</title>
 			<link rel="stylesheet" href="/public/styles.css"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"/>
 			<script src="https://unpkg.com/htmx.org@1.9.10"></script>
 			<script src="https://cdn.jsdelivr.net/gh/gnat/surreal@main/surreal.js"></script>
 			<script src="https://cdn.jsdelivr.net/gh/SortableJS/Sortable@master/Sortable.js"></script>
 		</head>
-		<body class="flex flex-col h-dvh">
-			<main class="flex-1">
+		<body class="flex flex-col h-full sm:flex-row-reverse">
+			<main class="flex-1 overflow-scroll">
 				{ children... }
 			</main>
 			@nav(path)
@@ -19,14 +20,14 @@ templ Layout(title, path string) {
 }
 
 templ nav(path string) {
-	<nav class="bg-white border-t px-16 py-8 flex justify-between items-center">
+	<nav class="bg-white border-t border-r px-8 py-2 flex justify-between items-center sm:flex-col sm:px-4 sm:justify-start sm:gap-4">
 		for _, l := range links {
 			<a
 				href={ templ.SafeURL(l.Url) }
-				class={ "flex flex-col items-center gap-1 text-gray-500 group", templ.KV("active", path == l.Url) }
+				class={ "flex flex-col items-center text-gray-500 group", templ.KV("active", path == l.Url) }
 			>
-				@l.Icon("w-12 h-12 stroke-2 group-[.active]:text-gray-900")
-				<span class="text-3xl font-medium group-[.active]:text-gray-900">
+				@l.Icon("w-6 h-6 stroke-2 group-[.active]:text-gray-900")
+				<span class="text-sm font-medium group-[.active]:text-gray-900">
 					{ l.Title }
 				</span>
 			</a>

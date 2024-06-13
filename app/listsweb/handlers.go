@@ -106,20 +106,20 @@ func deleteListHandler(listCore *lists.Core) http.Handler {
 			return
 		}
 		// TODO: avoid a redirect
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, "/lists", http.StatusSeeOther)
 	})
 }
 
 func createListHandler(listCore *lists.Core) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		userID := auth.UserID(r.Context())
-		_, err := listCore.Create(r.Context(), lists.NewList{CreatedDate: time.Now(), UserID: userID})
+		list, err := listCore.Create(r.Context(), lists.NewList{CreatedDate: time.Now(), UserID: userID})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		// TODO: avoid a redirect
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, "/lists/"+list.ID.String(), http.StatusSeeOther)
 	})
 }
 

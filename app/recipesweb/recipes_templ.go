@@ -35,45 +35,45 @@ func Ingredients(recipe Recipe, availableIngredients []Item) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"recipe bg-white rounded shadow py-2 px-6\" id=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"rounded-xl border border-gray-100 shadow-lg px-2\" id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("recipe-%v", recipe.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/recipesweb/recipes.templ`, Line: 16, Col: 95}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/recipesweb/recipes.templ`, Line: 16, Col: 103}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><h2 class=\"text-gray-900 font-bold pb-2 border-b border-b-gray-200\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><h2 class=\"font-semibold text-lg text-black p-2 mb-2 border-b border-gray-300\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(recipe.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/recipesweb/recipes.templ`, Line: 17, Col: 83}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/recipesweb/recipes.templ`, Line: 17, Col: 94}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h2><div class=\"pt-3\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h2><div class=\"px-2 py-4\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, i := range recipe.Ingredients {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"grid grid-cols-3\"><p class=\"col-span-2\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"grid grid-cols-2\"><p class=\"col-span-1 py-1\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(i.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/recipesweb/recipes.templ`, Line: 21, Col: 35}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/recipesweb/recipes.templ`, Line: 21, Col: 40}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -118,7 +118,7 @@ func Ingredients(recipe Recipe, availableIngredients []Item) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-swap=\"outerHTML\" hx-vals=\"{&#34;quantity&#34;:&#34;1&#34;}\" class=\"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5\"><option value=\"\">Select an ingredient</option> ")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-swap=\"outerHTML\" hx-vals=\"{&#34;quantity&#34;:&#34;1&#34;}\" class=\"bg-white border border-gray-300 text-black rounded-full shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5\"><option value=\"\">Select an ingredient</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -186,17 +186,17 @@ func RecipesPage(path string, recipes []Recipe, availableIngredients []Item) tem
 				templ_7745c5c3_Buffer = templ.GetBuffer()
 				defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"grid grid-cols-1 gap-4 lg:grid-cols-3\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<section id=\"recipes\" class=\"grid grid-cols-1 gap-4 p-4 sm:grid-cols-3\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			for _, r := range recipes {
-				templ_7745c5c3_Err = Ingredients(r, availableIngredients).Render(ctx, templ_7745c5c3_Buffer)
+			for _, s := range recipes {
+				templ_7745c5c3_Err = Ingredients(s, availableIngredients).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"recipes\" class=\"border-4 border-dashed border-gray-300 bg-gray-200 rounded-lg shadow p-6\"><div class=\"flex items-center\"><form hx-post=\"/recipes\" hx-target=\"#recipes\" hx-swap=\"beforebegin\"><div class=\"grid grid-cols-3 gap-1 p-2\"><input class=\"col-span-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5\" placeholder=\"New recipe\" type=\"text\" name=\"recipeName\"> <input class=\"bg-indigo-800 p-2 rounded text-white\" type=\"submit\" value=\"Add\"></div></form></div></div></div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</section><div id=\"add-recipe-modal\" class=\"relative z-10 group\" aria-labelledby=\"modal-title\" role=\"dialog\" aria-modal=\"true\"><div class=\"fixed inset-0 bg-gray-500 bg-opacity-0 transition-opacity hidden group-[.active]:block group-[.active]:bg-opacity-75\"></div><div class=\"fixed inset-0 z-10 w-screen overflow-y-auto hidden group-[.active]:block\"><div class=\"flex min-h-full items-end justify-center p-4 text-center\"><form hx-post=\"/recipes\" hx-target=\"#recipes\" hx-swap=\"beforeend\" hx-on::after-request=\"this.reset(); me(&#39;#add-recipe-modal&#39;).classToggle(&#39;active&#39;)\" class=\"relative transform overflow-hidden rounded-lg bg-white text-left shadow-lg transition-all\"><div class=\"bg-white px-8 pb-8 pt-5\"><div class=\"mt-3 text-center\"><h3 class=\"text-lg font-semibold text-gray-900 pb-2\" id=\"modal-title\">Add recipe</h3><input class=\"col-span-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-full focus:ring-blue-500 focus:border-blue-500 block w-full py-2.5 px-1\" placeholder=\"New recipe\" type=\"text\" name=\"recipeName\" id=\"add-recipe-input\"></div></div><div class=\"bg-gray-50 px-2 pb-2 flex gap-1\"><input type=\"submit\" value=\"Add\" class=\"inline-flex w-full justify-center rounded-full bg-black px-1 py-2 font-semibold text-white shadow-sm hover:bg-red-500\"> <button type=\"button\" class=\"inline-flex w-full justify-center rounded-full bg-white px-1 py-2 font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50\">Cancel</button><script>\n\t\t\t\t\t\t\t\t(function(){\n\t\t\t\t\t\t\t\t\tconst modal = me(\"#add-recipe-modal\")\n\t\t\t\t\t\t\t\t\tme(\"-\").on(\"click\", evt => {halt(); modal.classToggle(\"active\")})\n\t\t\t\t\t\t\t\t})()\n\t\t\t\t\t\t\t</script></div></form></div></div></div><button class=\"absolute bg-white bottom-24 right-4 border border-gray-300 rounded-full shadow-lg py-2 px-3 text-gray-500\">+ New recipe</button><script>\n\t\t\t(function(){\n\t\t\t\tconst modal = me(\"#add-recipe-modal\")\n\t\t\t\tconst inp = me(\"#add-recipe-input\")\n\t\t\t\tme(\"-\").on(\"click\", evt => {\n\t\t\t\t\tmodal.classToggle(\"active\")\n\t\t\t\t\tinp.focus()\n\t\t\t\t})\n\t\t\t})()\n\t\t</script>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

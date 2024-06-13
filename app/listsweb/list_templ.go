@@ -39,14 +39,14 @@ func ListRecipes(
 		}
 		ctx = templ.ClearChildren(ctx)
 		for _, recipe := range list.Recipes {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"grid grid-cols-3\"><p class=\"col-span-2\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"grid grid-cols-2\"><p class=\"col-span-1 py-1\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(recipe.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/listsweb/list.templ`, Line: 21, Col: 38}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/listsweb/list.templ`, Line: 21, Col: 43}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
@@ -56,7 +56,7 @@ func ListRecipes(
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = common.SetQuantity(fmt.Sprintf("/lists/%v/recipe", list.ID), "body", "recipeID", recipe.ID, recipe.Quantity).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = common.SetQuantity(fmt.Sprintf("/lists/%v/recipe", list.ID), "#list", "recipeID", recipe.ID, recipe.Quantity).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -78,7 +78,7 @@ func ListRecipes(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-target=\"body\" hx-swap=\"outerHTML\" hx-vals=\"{&#34;quantity&#34;:&#34;1&#34;}\" class=\"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5\"><option value=\"\">Select a recipe</option> ")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-target=\"#list\" hx-select=\"#list\" hx-swap=\"outerHTML\" hx-vals=\"{&#34;quantity&#34;:&#34;1&#34;}\" class=\"bg-white border border-gray-300 text-black rounded-full shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5\"><option value=\"\">Select a recipe</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -91,7 +91,7 @@ func ListRecipes(
 				var templ_7745c5c3_Var4 string
 				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(v.ID)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/listsweb/list.templ`, Line: 38, Col: 25}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/listsweb/list.templ`, Line: 39, Col: 25}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
@@ -104,7 +104,7 @@ func ListRecipes(
 				var templ_7745c5c3_Var5 string
 				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(v.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/listsweb/list.templ`, Line: 38, Col: 36}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/listsweb/list.templ`, Line: 39, Col: 36}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
@@ -150,14 +150,14 @@ func ListItems(list List, availableItems []Item) templ.Component {
 		}
 		ctx = templ.ClearChildren(ctx)
 		for _, item := range list.Items {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"grid grid-cols-3\"><p class=\"col-span-2\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"grid grid-cols-2\"><p class=\"col-span-1 py-1\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(item.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/listsweb/list.templ`, Line: 57, Col: 36}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/listsweb/list.templ`, Line: 58, Col: 41}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -167,7 +167,7 @@ func ListItems(list List, availableItems []Item) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = common.SetQuantity(fmt.Sprintf("/lists/%v/item", list.ID), "body", "itemID", item.ID, item.Quantity).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = common.SetQuantity(fmt.Sprintf("/lists/%v/item", list.ID), "#list", "itemID", item.ID, item.Quantity).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -183,13 +183,13 @@ func ListItems(list List, availableItems []Item) templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/lists/%v/item", list.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/listsweb/list.templ`, Line: 65, Col: 50}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/listsweb/list.templ`, Line: 66, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-target=\"body\" hx-swap=\"outerHTML\" hx-vals=\"{&#34;quantity&#34;:&#34;1&#34;}\" class=\"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5\"><option value=\"\">Select an item</option> ")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-target=\"#list\" hx-select=\"#list\" hx-swap=\"outerHTML\" hx-vals=\"{&#34;quantity&#34;:&#34;1&#34;}\" class=\"bg-white border border-gray-300 text-black rounded-full shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5\"><option value=\"\">Select an item</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -202,7 +202,7 @@ func ListItems(list List, availableItems []Item) templ.Component {
 				var templ_7745c5c3_Var9 string
 				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(v.ID)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/listsweb/list.templ`, Line: 74, Col: 25}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/listsweb/list.templ`, Line: 76, Col: 25}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
@@ -215,7 +215,7 @@ func ListItems(list List, availableItems []Item) templ.Component {
 				var templ_7745c5c3_Var10 string
 				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(v.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/listsweb/list.templ`, Line: 74, Col: 36}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/listsweb/list.templ`, Line: 76, Col: 36}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {
@@ -257,20 +257,7 @@ func ListPage(path string, list List, availableRecipes []Recipe, availableItems 
 				templ_7745c5c3_Buffer = templ.GetBuffer()
 				defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex gap-4\"><button type=\"submit\" class=\"bg-red-600 p-2 text-white rounded\" hx-delete=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var13 string
-			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs("/lists/" + list.ID)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/listsweb/list.templ`, Line: 84, Col: 98}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-target=\"body\" hx-swap=\"outerHTML\" hx-push-url=\"true\">Delete</button></div><div class=\"grid grid-cols-1 gap-4 lg:grid-cols-3\"><div class=\"bg-white rounded shadow py-2 px-6\"><h2 class=\"text-gray-900 font-bold pb-2 border-b border-b-gray-200\">Recipes</h2><div class=\"py-2\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<section id=\"list\" class=\"grid grid-cols-1 gap-4 px-4 pt-4 pb-28 sm:grid-cols-3\"><h2 class=\"text-xl border-b border-gray-300 col-span-full font-bold px-4\">List</h2><div class=\"rounded-xl border border-gray-100 shadow-lg py-4 px-2\"><h2 class=\"font-semibold text-lg text-black p-2 mb-2 border-b border-gray-300\">Recipes</h2><div class=\"px-2 py-4\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -278,7 +265,7 @@ func ListPage(path string, list List, availableRecipes []Recipe, availableItems 
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div><div class=\"bg-white rounded shadow py-2 px-6\"><h2 class=\"text-gray-900 font-bold pb-2 border-b border-b-gray-200\">Items</h2><div class=\"py-2\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div><div class=\"rounded-xl border border-gray-100 shadow-lg py-4 px-2\"><h2 class=\"font-semibold text-lg text-black p-2 mb-2 border-b border-gray-300\">Items</h2><div class=\"px-2 py-4\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -286,39 +273,39 @@ func ListPage(path string, list List, availableRecipes []Recipe, availableItems 
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div><h2 class=\"text-xl border-b border-gray-300 col-span-full font-bold px-4\">Shops</h2>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for _, shop := range list.Shops {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"bg-white rounded shadow py-2 px-6\"><h2 class=\"text-gray-900 font-bold pb-2 border-b border-b-gray-200\">")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"rounded-xl border border-gray-100 shadow-lg py-4 px-2\"><h2 class=\"font-semibold text-lg text-black p-2 mb-2 border-b border-gray-300\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var14 string
-				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(shop.Name)
+				var templ_7745c5c3_Var13 string
+				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(shop.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/listsweb/list.templ`, Line: 103, Col: 84}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/listsweb/list.templ`, Line: 102, Col: 95}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h2><div class=\"py-2\"><div class=\"grid grid-cols-3 gap-1 p-2\">")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h2><div class=\"py-4 px-2\"><div class=\"flex flex-wrap gap-1\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				for _, i := range shop.Items {
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"border border-gray-100 rounded shadow p-2\">")
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"border border-gray-300 rounded-full shadow px-4 py-1\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var15 string
-					templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(i.Name)
+					var templ_7745c5c3_Var14 string
+					templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(i.Name)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/listsweb/list.templ`, Line: 107, Col: 71}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/listsweb/list.templ`, Line: 106, Col: 82}
 					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -326,12 +313,12 @@ func ListPage(path string, list List, availableRecipes []Recipe, availableItems 
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var16 string
-					templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(i.Quantity))
+					var templ_7745c5c3_Var15 string
+					templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(i.Quantity))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/listsweb/list.templ`, Line: 107, Col: 100}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/listsweb/list.templ`, Line: 106, Col: 111}
 					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -345,7 +332,20 @@ func ListPage(path string, list List, availableRecipes []Recipe, availableItems 
 					return templ_7745c5c3_Err
 				}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex p-8 col-span-full\"><button type=\"submit\" class=\"bg-red-600 py-2 px-4 text-white text-lg rounded-full shadow-lg mx-auto\" hx-delete=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var16 string
+			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs("/lists/" + list.ID)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/listsweb/list.templ`, Line: 113, Col: 136}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-target=\"#list\" hx-swap=\"outerHTML\" hx-push-url=\"true\">Delete list</button></div></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -384,39 +384,39 @@ func ListsPage(path string, lists []ListSummary) templ.Component {
 				templ_7745c5c3_Buffer = templ.GetBuffer()
 				defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"grid grid-cols-1 gap-4 lg:grid-cols-3\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<section class=\"grid grid-cols-1 gap-4 px-4 pt-4 pb-28 sm:grid-cols-3\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			for _, l := range lists {
+			for _, s := range lists {
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a href=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var19 templ.SafeURL = templ.SafeURL("/lists/" + l.ID)
+				var templ_7745c5c3_Var19 templ.SafeURL = templ.SafeURL("/lists/" + s.ID)
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var19)))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"bg-white shadow p-12 rounded text-gray-900 font-bold text-3xl\">")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"rounded-xl border border-gray-100 shadow-lg py-4 px-2\"><h2 class=\"font-semibold text-lg text-black p-2\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var20 string
-				templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(l.CreatedDate.Format("02 Jan 06 15:04"))
+				templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(s.CreatedDate.Format("02 Jan 06 15:04"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/listsweb/list.templ`, Line: 122, Col: 46}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/listsweb/list.templ`, Line: 126, Col: 95}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</a> ")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h2></a>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button class=\"bg-gray-600 p-12 rounded text-white text-5xl shadow\" value=\"New list\" hx-post=\"/lists\" hx-target=\"body\" hx-swap=\"outerHTML\">+</button></div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</section><button value=\"+ New list\" hx-post=\"/lists\" hx-target=\"#list\" hx-swap=\"outerHTML\" class=\"absolute bg-white bottom-24 right-4 border border-gray-300 rounded-full shadow-lg py-2 px-3 text-gray-500\">+ New list</button>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

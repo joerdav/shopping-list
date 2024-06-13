@@ -4,7 +4,7 @@ import "github.com/joerdav/shopping-list/app/common"
 
 templ HomePage(path string) {
 	@common.Layout("Home", path) {
-		<section class="grid grid-cols-1 gap-12 p-8">
+		<section class="grid grid-cols-1 gap-4 p-4">
 			@pageCard("Items", "Tell us the items you shop for and where you get them from.", "/shops")
 			@pageCard("Recipes", "What recipes do you make?", "/recipes")
 			@pageCard("Lists", "You are ready to make some lists! Enter what recipes or individual items you need and we'll sort out what shops you need!", "/lists")
@@ -14,12 +14,12 @@ templ HomePage(path string) {
 
 templ pageCard(name, description, path string) {
 	<a
-		class="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-shadow"
+		class="bg-white rounded-xl border border-gray-100 shadow-lg hover:shadow-2xl transition-shadow"
 		href={ templ.SafeURL(path) }
 	>
-		<div class="p-10 flex flex-col gap-5 h-full">
-			<h3 class="text-5xl font-semibold mb-2 text-left">{ name }</h3>
-			<p class="text-4xl text-gray-500 text-left">{ description }</p>
+		<div class="p-3 flex flex-col gap-1 h-full">
+			<h3 class="text-lg font-semibold mb-2 text-left">{ name }</h3>
+			<p class="text-gray-500 text-left">{ description }</p>
 		</div>
 	</a>
 }

@@ -20,17 +20,17 @@ templ DottedCard() {
 }
 
 templ SetQuantity(url, target, idName, id string, qty int) {
-	<div class="relative flex">
-		<form hx-put={ url } hx-target={ target } hx-swap="outerHTML">
+	<div class="relative flex w-full">
+		<form hx-put={ url } hx-select={ target } hx-target={ target } hx-swap="outerHTML">
 			<input type="hidden" name={ idName } value={ id }/>
 			<input type="hidden" name="quantity" value={ fmt.Sprint(qty - 1) }/>
-			<input type="submit" value="-" class="bg-gray-100 border border-gray-300 p-3 h-11 items-center align focus:ring-2 focus:outline-none rounded-s-lg"/>
+			<input type="submit" value="-" class="bg-black py-2 px-5 h-10 items-center align-middle focus:ring-2 focus:outline-none rounded-s-full text-white shadow-lg"/>
 		</form>
-		<p class="bg-gray-50 border border-x-0 border-gray-300 h-11 text-center text-gray-900 text-sm block w-full py-2.5">{ fmt.Sprint(qty) }</p>
-		<form hx-put={ url } hx-target={ target } hx-swap="outerHTML">
+		<p class="bg-gray-50 border border-x-0 border-gray-300 h-10 text-center text-gray-900 text-sm block w-full py-2 shadow-lg">{ fmt.Sprint(qty) }</p>
+		<form hx-put={ url } hx-select={ target } hx-target={ target } hx-swap="outerHTML">
 			<input type="hidden" name={ idName } value={ id }/>
 			<input type="hidden" name="quantity" value={ fmt.Sprint(qty + 1) }/>
-			<input type="submit" value="+" class="bg-gray-100 border border-gray-300 p-3 h-11 items-center align focus:ring-2 focus:outline-none rounded-e-lg"/>
+			<input type="submit" value="+" class="bg-black py-2 px-5 h-10 items-center align-middle focus:ring-2 focus:outline-none rounded-e-full text-white shadow-lg"/>
 		</form>
 	</div>
 }

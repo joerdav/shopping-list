@@ -17,9 +17,9 @@ templ ListRecipes(
 	availableRecipes []Recipe,
 ) {
 	for _, recipe := range list.Recipes {
-		<div class="grid grid-cols-3">
-			<p class="col-span-2">{ recipe.Name }</p>
-			@common.SetQuantity(fmt.Sprintf("/lists/%v/recipe", list.ID), "body", "recipeID", recipe.ID, recipe.Quantity)
+		<div class="grid grid-cols-2">
+			<p class="col-span-1 py-1">{ recipe.Name }</p>
+			@common.SetQuantity(fmt.Sprintf("/lists/%v/recipe", list.ID), "#list", "recipeID", recipe.ID, recipe.Quantity)
 		</div>
 	}
 	<div>
@@ -27,10 +27,11 @@ templ ListRecipes(
 			name="recipeID"
 			hx-trigger="change"
 			hx-put={ fmt.Sprintf("/lists/%v/recipe", list.ID) }
-			hx-target="body"
+			hx-target="#list"
+			hx-select="#list"
 			hx-swap="outerHTML"
 			hx-vals='{"quantity":"1"}'
-			class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+			class="bg-white border border-gray-300 text-black rounded-full shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
 		>
 			<option value="">Select a recipe</option>
 			for _, v := range availableRecipes {
@@ -53,9 +54,9 @@ func itemInList(itemID string, list List) bool {
 
 templ ListItems(list List, availableItems []Item) {
 	for _, item := range list.Items {
-		<div class="grid grid-cols-3">
-			<p class="col-span-2">{ item.Name }</p>
-			@common.SetQuantity(fmt.Sprintf("/lists/%v/item", list.ID), "body", "itemID", item.ID, item.Quantity)
+		<div class="grid grid-cols-2">
+			<p class="col-span-1 py-1">{ item.Name }</p>
+			@common.SetQuantity(fmt.Sprintf("/lists/%v/item", list.ID), "#list", "itemID", item.ID, item.Quantity)
 		</div>
 	}
 	<div>
@@ -63,10 +64,11 @@ templ ListItems(list List, availableItems []Item) {
 			name="itemID"
 			hx-trigger="change"
 			hx-put={ fmt.Sprintf("/lists/%v/item", list.ID) }
-			hx-target="body"
+			hx-target="#list"
+			hx-select="#list"
 			hx-swap="outerHTML"
 			hx-vals='{"quantity":"1"}'
-			class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+			class="bg-white border border-gray-300 text-black rounded-full shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
 		>
 			<option value="">Select an item</option>
 			for _, v := range availableItems {
@@ -80,55 +82,57 @@ templ ListItems(list List, availableItems []Item) {
 
 templ ListPage(path string, list List, availableRecipes []Recipe, availableItems []Item) {
 	@common.Layout(list.CreatedDate.Format("List - 02 Jan 06 15:04"), path) {
-		<div class="flex gap-4">
-			<button type="submit" class="bg-red-600 p-2 text-white rounded" hx-delete={ "/lists/" + list.ID } hx-target="body" hx-swap="outerHTML" hx-push-url="true">
-				Delete
-			</button>
-		</div>
-		<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
-			<div class="bg-white rounded shadow py-2 px-6">
-				<h2 class="text-gray-900 font-bold pb-2 border-b border-b-gray-200">Recipes</h2>
-				<div class="py-2">
+		<section id="list" class="grid grid-cols-1 gap-4 px-4 pt-4 pb-28 sm:grid-cols-3">
+			<h2 class="text-xl border-b border-gray-300 col-span-full font-bold px-4">List</h2>
+			<div class="rounded-xl border border-gray-100 shadow-lg py-4 px-2">
+				<h2 class="font-semibold text-lg text-black p-2 mb-2 border-b border-gray-300">Recipes</h2>
+				<div class="px-2 py-4">
 					@ListRecipes(list, availableRecipes)
 				</div>
 			</div>
-			<div class="bg-white rounded shadow py-2 px-6">
-				<h2 class="text-gray-900 font-bold pb-2 border-b border-b-gray-200">Items</h2>
-				<div class="py-2">
+			<div class="rounded-xl border border-gray-100 shadow-lg py-4 px-2">
+				<h2 class="font-semibold text-lg text-black p-2 mb-2 border-b border-gray-300">Items</h2>
+				<div class="px-2 py-4">
 					@ListItems(list, availableItems)
 				</div>
 			</div>
+			<h2 class="text-xl border-b border-gray-300 col-span-full font-bold px-4">Shops</h2>
 			for _, shop := range list.Shops {
-				<div class="bg-white rounded shadow py-2 px-6">
-					<h2 class="text-gray-900 font-bold pb-2 border-b border-b-gray-200">{ shop.Name }</h2>
-					<div class="py-2">
-						<div class="grid grid-cols-3 gap-1 p-2">
+				<div class="rounded-xl border border-gray-100 shadow-lg py-4 px-2">
+					<h2 class="font-semibold text-lg text-black p-2 mb-2 border-b border-gray-300">{ shop.Name }</h2>
+					<div class="py-4 px-2">
+						<div class="flex flex-wrap gap-1">
 							for _, i := range shop.Items {
-								<div class="border border-gray-100 rounded shadow p-2">{ i.Name } x { fmt.Sprint(i.Quantity) }</div>
+								<div class="border border-gray-300 rounded-full shadow px-4 py-1">{ i.Name } x { fmt.Sprint(i.Quantity) }</div>
 							}
 						</div>
 					</div>
 				</div>
 			}
-		</div>
+			<div class="flex p-8 col-span-full">
+				<button type="submit" class="bg-red-600 py-2 px-4 text-white text-lg rounded-full shadow-lg mx-auto" hx-delete={ "/lists/" + list.ID } hx-target="#list" hx-swap="outerHTML" hx-push-url="true">
+					Delete list
+				</button>
+			</div>
+		</section>
 	}
 }
 
 templ ListsPage(path string, lists []ListSummary) {
 	@common.Layout("Lists", path) {
-		<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
-			for _, l := range lists {
-				<a href={ templ.SafeURL("/lists/" + l.ID) } class="bg-white shadow p-12 rounded text-gray-900 font-bold text-3xl">
-					{ l.CreatedDate.Format("02 Jan 06 15:04") }
+		<section class="grid grid-cols-1 gap-4 px-4 pt-4 pb-28 sm:grid-cols-3">
+			for _, s := range lists {
+				<a href={ templ.SafeURL("/lists/" + s.ID) } class="rounded-xl border border-gray-100 shadow-lg py-4 px-2">
+					<h2 class="font-semibold text-lg text-black p-2">{ s.CreatedDate.Format("02 Jan 06 15:04") }</h2>
 				</a>
 			}
-			<button
-				class="bg-gray-600 p-12 rounded text-white text-5xl shadow"
-				value="New list"
-				hx-post="/lists"
-				hx-target="body"
-				hx-swap="outerHTML"
-			>+</button>
-		</div>
+		</section>
+		<button
+			value="+ New list"
+			hx-post="/lists"
+			hx-target="#list"
+			hx-swap="outerHTML"
+			class="absolute bg-white bottom-24 right-4 border border-gray-300 rounded-full shadow-lg py-2 px-3 text-gray-500"
+		>+ New list</button>
 	}
 }

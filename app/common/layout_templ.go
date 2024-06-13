@@ -36,7 +36,7 @@ func Layout(title, path string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><link rel=\"stylesheet\" href=\"/public/styles.css\"><script src=\"https://unpkg.com/htmx.org@1.9.10\"></script><script src=\"https://cdn.jsdelivr.net/gh/gnat/surreal@main/surreal.js\"></script><script src=\"https://cdn.jsdelivr.net/gh/SortableJS/Sortable@master/Sortable.js\"></script></head><body class=\"flex flex-col h-dvh\"><main class=\"flex-1\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</title><link rel=\"stylesheet\" href=\"/public/styles.css\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover\"><script src=\"https://unpkg.com/htmx.org@1.9.10\"></script><script src=\"https://cdn.jsdelivr.net/gh/gnat/surreal@main/surreal.js\"></script><script src=\"https://cdn.jsdelivr.net/gh/SortableJS/Sortable@master/Sortable.js\"></script></head><body class=\"flex flex-col h-full sm:flex-row-reverse\"><main class=\"flex-1 overflow-scroll\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -76,12 +76,12 @@ func nav(path string) templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<nav class=\"bg-white border-t px-16 py-8 flex justify-between items-center\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<nav class=\"bg-white border-t border-r px-8 py-2 flex justify-between items-center sm:flex-col sm:px-4 sm:justify-start sm:gap-4\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, l := range links {
-			var templ_7745c5c3_Var4 = []any{"flex flex-col items-center gap-1 text-gray-500 group", templ.KV("active", path == l.Url)}
+			var templ_7745c5c3_Var4 = []any{"flex flex-col items-center text-gray-500 group", templ.KV("active", path == l.Url)}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var4...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -112,18 +112,18 @@ func nav(path string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = l.Icon("w-12 h-12 stroke-2 group-[.active]:text-gray-900").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = l.Icon("w-6 h-6 stroke-2 group-[.active]:text-gray-900").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<span class=\"text-3xl font-medium group-[.active]:text-gray-900\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<span class=\"text-sm font-medium group-[.active]:text-gray-900\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(l.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/common/layout.templ`, Line: 30, Col: 14}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/common/layout.templ`, Line: 31, Col: 14}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
