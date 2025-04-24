@@ -1,0 +1,24 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "shopsweb",
+    srcs = [
+        "handlers.go",
+        "shops_templ.go",
+    ],
+    importpath = "github.com/joerdav/shopping-list/app/shopsweb",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//app/common",
+        "//app/itemsweb",
+        "//app/middleware",
+        "//business/auth",
+        "//business/items",
+        "//business/items/itemsdb",
+        "//business/shops",
+        "//business/shops/shopsdb",
+        "//foundation/routing",
+        "@com_github_a_h_templ//:templ",
+        "@com_github_a_h_templ//runtime",
+    ],
+)

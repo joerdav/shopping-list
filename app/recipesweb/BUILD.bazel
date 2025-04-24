@@ -1,0 +1,24 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "recipesweb",
+    srcs = [
+        "handlers.go",
+        "recipes_templ.go",
+    ],
+    importpath = "github.com/joerdav/shopping-list/app/recipesweb",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//app/common",
+        "//app/middleware",
+        "//business/auth",
+        "//business/items",
+        "//business/items/itemsdb",
+        "//business/recipes",
+        "//business/recipes/recipesdb",
+        "//foundation/routing",
+        "@com_github_a_h_templ//:templ",
+        "@com_github_a_h_templ//runtime",
+        "@com_github_google_uuid//:uuid",
+    ],
+)

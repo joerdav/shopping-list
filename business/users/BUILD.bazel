@@ -1,0 +1,11 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "users",
+    srcs = [
+        "models.go",
+        "users.go",
+    ],
+    importpath = "github.com/joerdav/shopping-list/business/users",
+    visibility = ["//visibility:public"],
+)

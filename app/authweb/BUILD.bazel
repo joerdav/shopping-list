@@ -1,0 +1,14 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "authweb",
+    srcs = ["handler.go"],
+    importpath = "github.com/joerdav/shopping-list/app/authweb",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//business/auth",
+        "//business/users",
+        "//business/users/usersdb",
+        "@com_github_dgrijalva_jwt_go//:jwt-go",
+    ],
+)

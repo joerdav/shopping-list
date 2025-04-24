@@ -1,0 +1,13 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "itemsdb",
+    srcs = ["itemsdb.go"],
+    importpath = "github.com/joerdav/shopping-list/business/items/itemsdb",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//business/items",
+        "//db",
+        "@com_github_google_uuid//:uuid",
+    ],
+)

@@ -1,0 +1,13 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "recipesdb",
+    srcs = ["recipesdb.go"],
+    importpath = "github.com/joerdav/shopping-list/business/recipes/recipesdb",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//business/recipes",
+        "//db",
+        "@com_github_google_uuid//:uuid",
+    ],
+)

@@ -1,0 +1,8 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "routing",
+    srcs = ["routing.go"],
+    importpath = "github.com/joerdav/shopping-list/foundation/routing",
+    visibility = ["//visibility:public"],
+)

@@ -1,0 +1,12 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "shops",
+    srcs = [
+        "models.go",
+        "shops.go",
+    ],
+    importpath = "github.com/joerdav/shopping-list/business/shops",
+    visibility = ["//visibility:public"],
+    deps = ["@com_github_google_uuid//:uuid"],
+)

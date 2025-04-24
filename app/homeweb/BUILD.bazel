@@ -1,0 +1,19 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "homeweb",
+    srcs = [
+        "handlers.go",
+        "home_templ.go",
+    ],
+    importpath = "github.com/joerdav/shopping-list/app/homeweb",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//app/common",
+        "//app/middleware",
+        "//business/auth",
+        "//foundation/routing",
+        "@com_github_a_h_templ//:templ",
+        "@com_github_a_h_templ//runtime",
+    ],
+)

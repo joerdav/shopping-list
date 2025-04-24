@@ -1,0 +1,12 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "usersdb",
+    srcs = ["usersdb.go"],
+    importpath = "github.com/joerdav/shopping-list/business/users/usersdb",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//business/users",
+        "//db",
+    ],
+)

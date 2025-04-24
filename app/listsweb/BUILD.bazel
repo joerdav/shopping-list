@@ -1,0 +1,28 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "listsweb",
+    srcs = [
+        "handlers.go",
+        "list_templ.go",
+    ],
+    importpath = "github.com/joerdav/shopping-list/app/listsweb",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//app/common",
+        "//app/middleware",
+        "//business/auth",
+        "//business/items",
+        "//business/items/itemsdb",
+        "//business/lists",
+        "//business/lists/listsdb",
+        "//business/recipes",
+        "//business/recipes/recipesdb",
+        "//business/shops",
+        "//business/shops/shopsdb",
+        "//foundation/routing",
+        "@com_github_a_h_templ//:templ",
+        "@com_github_a_h_templ//runtime",
+        "@com_github_google_uuid//:uuid",
+    ],
+)

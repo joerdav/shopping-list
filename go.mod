@@ -1,9 +1,11 @@
 module github.com/joerdav/shopping-list
 
-go 1.22
+go 1.23.0
+
+toolchain go1.24.0
 
 require (
-	github.com/a-h/templ v0.2.707
+	github.com/a-h/templ v0.3.857
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/golang-migrate/migrate/v4 v4.17.1
 	github.com/google/uuid v1.6.0
